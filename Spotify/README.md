@@ -34,6 +34,25 @@ W tym folderze znajdują się dwa pliki csv - train_set i test_set. Wiadomo o co
 | liveness                 | double    | Detects the presence of an audience in the recording. Higher liveness values represent an increased probability that the track was performed live. A value above 0.8 provides strong likelihood that the track is live.                                                                                                                                                                                                                                                                                            |
 | valence                  | double    | A measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track. Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric), while tracks with low valence sound more negative (e.g. sad, depressed, angry).                                                                                                                                                                                                                                                                  |
 | tempo                    | double    | The overall estimated tempo of a track in beats per minute (BPM). In musical terminology, tempo is the speed or pace of a given piece and derives directly from the average beat duration.                                                                                                                                                                                                                                                                                                                         |
-Projekty data science
 
-Główne miejsce naszych projektów
+
+## Cel
+
+Jest to pierwszy projekt, więc zadanie nie będzie trudne. Oto co musi zrobić każdy z nas:
+* trzeba będzie przeprowadzić dowolną analizę zbioru (to mogą być wykresy najczęściej występujących artystów, rozkłady zmiennych opisujących),  
+* trzeba będzie stwqrzyć dowolny model klasyfikujący piosenki do gatunku muzyki (zmienna playlist_genre).
+
+## Uwagi
+
+* to nie ma być nic skomplikowanego więc jako zmienne objaśniające używamy tylko zmiennych numerycznych opisujących piosenki (danceability, energy, loudness, mode, speechiness, instrumentalness, liveness, valence, tempo),
+* Metryką jakiej będziemy używali do oceny modeli będzie Accuracy (inne w tym projekcie nas nie interesują),
+* To jest klasyfikacja wieloklasowa (a nie binarna), więc regresja logistyczna w najprostszej formie się tu nie sprawdzi,
+* Zachęcam do używania RMarkdown - dużo ładniej w tym wyglądają analizy,
+* Aktualizujcie naszego GITa jak najszybciej i ogarniajcie projekty innych - to jest najlepsza droga do nauki i inspiracji,
+* Jak ktoś ma pytania techniczne, to najlepiej zadać je na Slacku - wtedy wszyscy widzą i nic nie przepada.
+
+## Kroki
+
+1. Tworzymy folder ze swoim imieniem,
+2. Robimy analizę eksploracyjną zbioru danych (jeden plik),
+3. Tworzymy jak najlepszy model klasyfikujący (drugi plik).
