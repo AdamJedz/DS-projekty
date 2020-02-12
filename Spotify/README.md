@@ -48,7 +48,7 @@ Jest to pierwszy projekt, więc zadanie nie będzie trudne. Oto co musi zrobić 
 * Metryką jakiej będziemy używali do oceny modeli będzie Accuracy (inne w tym projekcie nas nie interesują),
 * To jest klasyfikacja wieloklasowa (a nie binarna), więc regresja logistyczna w najprostszej formie się tu nie sprawdzi,
 * Zachęcam do używania RMarkdown - dużo ładniej w tym wyglądają analizy,
-* Aktualizujcie naszego GITa jak najszybciej i ogarniajcie projekty innych - to jest najlepsza droga do nauki i inspiracji,
+* Aktualizujcie naszego GITa jak najczęściej i ogarniajcie projekty innych - to jest najlepsza droga do nauki i inspiracji,
 * Jak ktoś ma pytania techniczne, to najlepiej zadać je na Slacku - wtedy wszyscy widzą i nic nie przepada.
 
 ## Kroki
