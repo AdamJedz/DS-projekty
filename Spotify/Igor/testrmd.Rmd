@@ -1,0 +1,17 @@
+---
+title: "none"
+output: github_document
+---
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+df <- read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-01-21/spotify_songs.csv")
+```
+
+```{r}
+df %>% head()
+```
+
