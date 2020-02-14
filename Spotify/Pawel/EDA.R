@@ -4,6 +4,7 @@ library(ggplot2)
 library(tidyverse)
 library(kableExtra)
 library(ggthemes)
+library(corrplot)
 
 
 #create global theme to use later
@@ -152,7 +153,7 @@ ggplot(temp, aes(x = playlist_genre, y = acousticness)) +
   my_theme  + ggtitle("Distribution of acousticness") 
 
 
-#instrumentalness
+#instrumentalness - only after log scaling we can distribution, most songs are not instrumental
 quantile(mydata$instrumentalness,seq(0,1,by=0.1))
 
 temp <- mydata %>% select(playlist_genre, instrumentalness) %>% group_by(playlist_genre)
@@ -165,13 +166,63 @@ ggplot(temp, aes(instrumentalness)) +
   facet_wrap(~ playlist_genre)
 
 ggplot(temp, aes(instrumentalness)) +
-  geom_histogram(bins = 50, aes(y = ..density..), fill = "red") +  
+  geom_histogram(bins = 5, aes(y = ..density..), fill = "red") +  
   geom_density(alpha = 0.002, fill = "black") + 
   my_theme  + ggtitle("Distribution of instrumentalness") +
   geom_vline(xintercept = round(mean(temp$instrumentalness), 2), size = 1, linetype = 2) +
   facet_wrap(~ playlist_genre) +scale_x_log10()
 
 
-ggplot(temp, aes(x = playlist_genre, y = instrumentalness)) +
-  geom_boxplot() +  
-  my_theme  + ggtitle("Distribution of instrumentalness") 
+
+
+#liveness + log() scaling
+
+temp <- mydata %>% select(playlist_genre, liveness) %>% group_by(playlist_genre)
+
+ggplot(temp, aes(liveness)) +
+  geom_histogram(bins = 50, aes(y = ..density..), fill = "red") +  
+  geom_density(alpha = 0.002, fill = "black") + 
+  my_theme  + ggtitle("Distribution of liveness") +
+  geom_vline(xintercept = round(mean(temp$liveness), 2), size = 1, linetype = 2) +
+  facet_wrap(~ playlist_genre) +scale_x_log10()
+
+
+
+#valence
+
+temp <- mydata %>% select(playlist_genre, valence) %>% group_by(playlist_genre)
+
+ggplot(temp, aes(valence)) +
+  geom_histogram(bins = 50, aes(y = ..density..), fill = "red") +  
+  geom_density(alpha = 0.002, fill = "black") + 
+  my_theme  + ggtitle("Distribution of valence") +
+  geom_vline(xintercept = round(mean(temp$valence), 2), size = 1, linetype = 2) +
+  facet_wrap(~ playlist_genre)
+
+
+#tempo 
+#strange outliers in edm
+#excluding outliers
+
+temp <- mydata %>% select(playlist_genre, tempo) %>% filter(tempo > quantile(tempo, 0.95)) %>% group_by(playlist_genre)
+
+ggplot(temp, aes(tempo)) +
+  geom_histogram(bins = 20, aes(y = ..density..), fill = "red") +  
+  geom_density(alpha = 0.002, fill = "black") + 
+  my_theme  + ggtitle("Distribution of tempo") +
+  geom_vline(xintercept = round(mean(temp$tempo), 2), size = 1, linetype = 2) +
+  facet_wrap(~ playlist_genre)
+
+quantile(mydata$tempo,seq(0,1,by=0.1))
+
+
+#checking correlation
+#checking the correlation, used spearman as the data doesn't show big linearities
+
+temp <- my_limited[complete.cases(my_limited), ]
+temp <- temp[-1]
+
+
+cor_mat <- cor(temp)
+corrplot(cor_mat) 
+#energy shows big positive correlation to loudness and rather big negative corr to acousticness. Perhaps some variables should be removed
