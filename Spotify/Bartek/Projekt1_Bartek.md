@@ -349,22 +349,33 @@ subgenre <- data.frame(table(mydata_train$playlist_genre, mydata_train$playlist_
 colnames(subgenre) <- c("Genre","Subgenre", "n") 
 subgenre <- subgenre[-which(subgenre$n == 0 ), ]
 
+#????
+genreMeans <- aggregate(. ~ Genre, subgenre[-2], mean)
+for(i in 1:nrow(subgenre)) {
+  for(j in 1:nrow(genreMeans)){
+    if(subgenre$Genre[i] == genreMeans$Genre[j]) {
+      subgenre$Means[i] = genreMeans$n[j]
+    }
+  }
+}
+
 #ordering data by nr of tracks in each subgenre and grouping with genres
 subgenre <- subgenre[order(subgenre$n),]
 subgenre$Subgenre <- factor(subgenre$Subgenre, levels = subgenre$Subgenre[order(subgenre$Genre)])
 
 
-ggplot(subgenre) +
-  geom_bar(aes(x=Subgenre, y=n, fill=Genre), stat = "identity") +
+ggplot(subgenre, aes(x=Subgenre, y=n, fill=Genre)) +
+  geom_bar(stat = "identity") +
   ylab("Nr of tracks") +   
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-  ggtitle("Nr of tracks in each subgenre") 
+  ggtitle("Nr of tracks in each subgenre") +
+  geom_point(aes(y=Means))
 ```
 
 ![](Projekt1_Bartek_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 ``` r
-#jak zrobic osobne linie średnich dla kazdego gatunku?
+#chyba nie tak powinnno to wygladac xD
 ```
 
 ``` r
@@ -406,7 +417,8 @@ ggplot(relYear, aes(year, fill=playlist_genre)) +
   geom_histogram(stat="count", binwidth = 50) +
   my_theme +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-  scale_x_discrete(breaks = c("1980", "1990", "2000", "2010", "2020"))
+  scale_x_discrete(breaks = c("1970", "1980", "1990", "2000", "2010", "2020")) +
+  ggtitle("Nr of released tracks in each year")
 ```
 
     ## Warning: Ignoring unknown parameters: binwidth, bins, pad
