@@ -42,6 +42,7 @@ conf <- table(test_labels, pred)
 accs[k] <- sum(diag(conf)) / sum(conf)
 accs[k]
 
+<<<<<<< HEAD
 table(pred)
 table(test_labels)
 conf
