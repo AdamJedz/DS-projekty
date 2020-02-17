@@ -1,6 +1,6 @@
 ---
 title: "Projekt1_Bartek"
-author: "bon jowi"
+author: "Bartosz Adamiec"
 date: "17 02 2020"
 output: github_document
 always_allow_html: true
@@ -81,7 +81,8 @@ genreplot <- ggplot(genrecount) +
   geom_col(aes(x=vars, y=n, fill=vars)) +
   ggtitle("Nr of tracks in each genre") +
   xlab("Genre") +
-  ylab("Nr of tracks")
+  ylab("Nr of tracks") +
+  my_theme
 genreplot
 
 
@@ -105,9 +106,61 @@ subgenre$Subgenre <- factor(subgenre$Subgenre, levels = subgenre$Subgenre[order(
 
 ggplot(subgenre) +
   geom_bar(aes(x=Subgenre, y=n, fill=Genre), stat = "identity") +
-  ylab("Nr of tracks") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+  ylab("Nr of tracks") +   
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ggtitle("Nr of tracks in each subgenre") 
 
+
+#jak zrobic osobne linie średnich dla kazdego gatunku?
 
 ```
+
+```{r}
+#POPULARITY
+popTracks <- mydata_train %>% select(track_name, playlist_genre, playlist_subgenre, track_popularity) %>% group_by(playlist_genre)
+
+#Most popuplar tracks
+popTracks[popTracks['track_popularity'] == max(popTracks['track_popularity']),]
+
+#Popuarity distribution with genres
+ggplot(popTracks, aes(track_popularity, fill=playlist_genre)) +
+  geom_histogram(bins=50) +
+  geom_vline(xintercept = mean(popTracks$track_popularity), size = 1, linetype = 6) +
+  my_theme +
+  ggtitle("Distribution of track popularities")
+```
+
+
+```{r}
+#RELEASE YEAR
+relYear <- mydata_train %>% select(playlist_genre, track_album_release_date) %>% group_by(playlist_genre)
+
+#format date to year
+relYear$track_album_release_date <- as.Date(relYear$track_album_release_date)
+relYear$year <- format(relYear$track_album_release_date, format="%Y")
+relYear <- relYear[complete.cases(relYear),]
+
+ggplot(relYear, aes(year, fill=playlist_genre)) +
+  geom_histogram(stat="count", binwidth = 50) +
+  my_theme +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  scale_x_discrete(breaks = c("1980", "1990", "2000", "2010", "2020"))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
