@@ -26,9 +26,9 @@ library(corrplot)
 #environment preparation and data load
 my_theme <- theme_fivethirtyeight() + theme(axis.title = element_text(), axis.title.x = element_text())
 
-mydata_train <- read.csv("./train_set.csv", stringsAsFactors = FALSE, na.strings="")
+mydata_train <- read.csv("../train_set.csv", stringsAsFactors = FALSE, na.strings="")
 
-mydata_test <- read.csv("./test_set.csv", stringsAsFactors = FALSE, na.strings="")
+mydata_test <- read.csv("../test_set.csv", stringsAsFactors = FALSE, na.strings="")
 ```
 
 ```{r}
