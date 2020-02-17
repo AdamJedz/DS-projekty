@@ -1,0 +1,20 @@
+---
+title: "Modelowanie_rmd"
+author: "Pawel Ciechanowicz"
+date: "17 02 2020"
+output: html_document
+---
+
+
+```{r}
+lim_train_t <- mydata_train %>% select(playlist_genre, track_popularity, danceability, energy, key, loudness, mode, acousticness, instrumentalness, liveness, valence, tempo)
+
+
+lim_test_t <- mydata_test %>% select(playlist_genre, track_popularity, danceability, energy, key, loudness, mode, acousticness, instrumentalness, liveness, valence, tempo)
+```
+
+```{r}
+tree <- rpart(playlist_genre ~ ., lim_train_t, method = "class", control = rpart.control(cp=0.001))
+
+fancyRpartPlot(tree)
+```
