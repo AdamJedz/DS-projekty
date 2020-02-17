@@ -1,0 +1,112 @@
+---
+title: "Projekt1_Bartek"
+author: "bon jowi"
+date: "17 02 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#install.packages("fansi")
+library(dplyr)
+library(lubridate)
+library(ggplot2)
+library(tidyverse)
+library(kableExtra)
+library(ggthemes)
+library(corrplot)
+```
+
+
+```{r}
+#environment preparation and data load
+my_theme <- theme_fivethirtyeight() + theme(axis.title = element_text(), axis.title.x = element_text())
+
+mydata_train <- read.csv("./train_set.csv", stringsAsFactors = FALSE, na.strings="")
+
+mydata_test <- read.csv("./test_set.csv", stringsAsFactors = FALSE, na.strings="")
+```
+
+```{r}
+#removing useless columns(columns with id numbers, not needed in this data analysis)
+mydata_train[,c("track_id", "track_album_id", "playlist_id")] <- NULL
+
+```
+
+```{r}
+#first look at the dataframe
+head(mydata_train)
+#structure of df
+str(mydata_train)
+#dimensions
+dim(mydata_train)
+#more info about each collumn
+summary(mydata_train)
+```
+
+```{r}
+#checking nr of null values in each collumn
+na_count <-sapply(mydata_train, function(y) sum(length(which(is.na(y)))))
+na_count <- data.frame(na_count)
+na_count
+
+```
+
+```{r}
+#looking at rows with missing track name
+mydata_train[is.na(mydata_train$track_name),]
+
+#as we see all of the missing values are from 4 tracks
+```
+
+```{r}
+#GENRES
+
+#nr of unique genres
+length(unique(mydata_train$playlist_genre))
+
+#genre names
+unique(mydata_train$playlist_genre)
+
+#how many tracks belong to each genre
+genrecount <- count(mydata_train, vars = mydata_train$playlist_genre)
+genrecount
+
+#plot
+genreplot <- ggplot(genrecount) +
+  geom_col(aes(x=vars, y=n, fill=vars)) +
+  ggtitle("Nr of tracks in each genre") +
+  xlab("Genre") +
+  ylab("Nr of tracks")
+genreplot
+
+
+
+
+```
+
+
+```{r}
+#SUBGENRES
+
+#extracting genres and subgenres from df
+subgenre <- data.frame(table(mydata_train$playlist_genre, mydata_train$playlist_subgenre))
+colnames(subgenre) <- c("Genre","Subgenre", "n") 
+subgenre <- subgenre[-which(subgenre$n == 0 ), ]
+
+#ordering data by nr of tracks in each subgenre and grouping with genres
+subgenre <- subgenre[order(subgenre$n),]
+subgenre$Subgenre <- factor(subgenre$Subgenre, levels = subgenre$Subgenre[order(subgenre$Genre)])
+
+
+ggplot(subgenre) +
+  geom_bar(aes(x=Subgenre, y=n, fill=Genre), stat = "identity") +
+  ylab("Nr of tracks") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+
+```
+
