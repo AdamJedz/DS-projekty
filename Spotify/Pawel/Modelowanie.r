@@ -1,5 +1,9 @@
 #Modelowanie
 library(class)
+library(rpart)
+library(rattle)
+library(rpart.plot)
+library(RColorBrewer)
 
 
 mydata_train <- read.csv("../train_set.csv", stringsAsFactors = FALSE, na.strings="")
@@ -42,7 +46,7 @@ conf <- table(test_labels, pred)
 accs[k] <- sum(diag(conf)) / sum(conf)
 accs[k]
 
-<<<<<<< HEAD
+
 table(pred)
 table(test_labels)
 conf
@@ -80,3 +84,9 @@ conf
 
 #normalizacja danych psuje model, obnizajac acc do 18%
 #większosc utworow przypisuje do r&b, rap, rock 
+
+
+
+
+
+
