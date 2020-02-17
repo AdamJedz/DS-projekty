@@ -2,7 +2,7 @@
 title: "Projekt1_Bartek"
 author: "bon jowi"
 date: "17 02 2020"
-output: html_document
+output: rmarkdown::github_document
 ---
 
 ```{r setup, include=FALSE}
