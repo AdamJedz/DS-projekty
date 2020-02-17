@@ -5,6 +5,9 @@ date: "17 02 2020"
 output: html_document
 ---
 
+```{r}
+set.seed(12345)
+```
 
 ```{r}
 lim_train_t <- mydata_train %>% select(playlist_genre, track_popularity, danceability, energy, key, loudness, mode, acousticness, instrumentalness, liveness, valence, tempo)
@@ -14,7 +17,68 @@ lim_test_t <- mydata_test %>% select(playlist_genre, track_popularity, danceabil
 ```
 
 ```{r}
-tree <- rpart(playlist_genre ~ ., lim_train_t, method = "class", control = rpart.control(cp=0.001))
+tree <- rpart(playlist_genre ~ ., lim_train_t, method = "class", control = rpart.control(cp=0.00001))
 
-fancyRpartPlot(tree)
+#fancyRpartPlot(tree)
+```
+
+```{r}
+
+```
+
+
+```{r}
+#summary(tree)
+```
+
+
+```{r}
+pred <- predict(tree, lim_test_t, type = "class")
+```
+
+
+```{r}
+conf <- table(lim_test_t$playlist_genre, pred)
+conf
+```
+
+
+
+```{r}
+accs <- sum(diag(conf)) / sum(conf)
+accs
+```
+
+```{r}
+range <- seq(0.00001,0.01,0.0001)
+accs <- rep(0, length(range))
+test_labels <- lim_test_t$playlist_genre
+
+for (cp in range) {
+  tree <- rpart(playlist_genre ~ ., lim_train_t, method = "class", control = rpart.control(cp=cp))
+  pred <- predict(tree, lim_test_t, type = "class")
+  conf <- table(test_labels, pred)  
+  accs[cp] <- sum(diag(conf)) / sum(conf)
+  
+}
+```
+
+
+
+```{r}
+plot(range, accs, xlab = "k")
+which.max(accs)
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
 ```
