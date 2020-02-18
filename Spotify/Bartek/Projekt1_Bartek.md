@@ -424,3 +424,306 @@ ggplot(relYear, aes(year, fill=playlist_genre)) +
     ## Warning: Ignoring unknown parameters: binwidth, bins, pad
 
 ![](Projekt1_Bartek_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+
+``` r
+#DANCEABILITY
+dancea <- mydata_train %>% select(playlist_genre, track_name, track_artist, danceability) %>% group_by(playlist_genre)
+#most danceable track
+dancea[dancea$danceability == max(dancea$danceability),]
+```
+
+    ## # A tibble: 1 x 4
+    ## # Groups:   playlist_genre [1]
+    ##   playlist_genre track_name                   track_artist     danceability
+    ##   <chr>          <chr>                        <chr>                   <dbl>
+    ## 1 edm            If Only I Could (feat. Stev~ Fusion Groove O~        0.983
+
+``` r
+ggplot(dancea, aes(danceability, fill=playlist_genre)) +
+  geom_histogram(bins=50) +
+  geom_vline(xintercept = mean(dancea$danceability), size = 1, linetype = 6) +
+  my_theme +
+  ggtitle("Distribution of tracks danceability")
+```
+
+![](Projekt1_Bartek_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+
+``` r
+#ENERGY
+energy <- mydata_train %>% select(playlist_genre, track_name, track_artist, energy) %>% group_by(playlist_genre)
+#most energetic tracks
+energy[energy$energy == max(energy$energy),]
+```
+
+    ## # A tibble: 2 x 4
+    ## # Groups:   playlist_genre [1]
+    ##   playlist_genre track_name                    track_artist          energy
+    ##   <chr>          <chr>                         <chr>                  <dbl>
+    ## 1 latin          Rain Forest and Tropical Bea~ Nature Sounds Nature~      1
+    ## 2 latin          Chill Waves & Wind in Leaves  Pinetree Way               1
+
+``` r
+ggplot(energy, aes(energy, fill=playlist_genre)) +
+  geom_histogram(bins=50) +
+  geom_vline(xintercept = mean(energy$energy), size = 1, linetype = 6) +
+  my_theme +
+  ggtitle("Distribution of tracks energy")
+```
+
+![](Projekt1_Bartek_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+
+``` r
+#KEYS
+keys <- mydata_train %>% select(playlist_genre, track_name, track_artist, key) %>% group_by(playlist_genre)
+
+ggplot(keys, aes(key, fill=playlist_genre)) +
+  geom_histogram(bins=50) +
+  my_theme +
+  ggtitle("Distribution of tracks keys") +
+  facet_wrap(~ playlist_genre)
+```
+
+![](Projekt1_Bartek_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+
+``` r
+#MODE
+mode <- mydata_train %>% select(playlist_genre, track_name, track_artist, mode) %>% group_by(playlist_genre)
+
+ggplot(mode, aes(mode, fill=playlist_genre)) +
+  geom_bar() +
+  my_theme +
+  ggtitle("Does track use mode?(N|Y)") +
+  scale_x_discrete(breaks = c(0, 1)) +
+  facet_wrap(~ playlist_genre) 
+```
+
+![](Projekt1_Bartek_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+
+``` r
+#LOUDNESS
+loud <- mydata_train %>% select(playlist_genre, track_name, track_artist, loudness) %>% group_by(playlist_genre)
+#loudest/most quiet tracks
+loud[loud$loudness == max(loud$loudness),]
+```
+
+    ## # A tibble: 1 x 4
+    ## # Groups:   playlist_genre [1]
+    ##   playlist_genre track_name               track_artist loudness
+    ##   <chr>          <chr>                    <chr>           <dbl>
+    ## 1 rock           Raw Power - Iggy Pop Mix The Stooges      1.27
+
+``` r
+loud[loud$loudness == min(loud$loudness),]
+```
+
+    ## # A tibble: 1 x 4
+    ## # Groups:   playlist_genre [1]
+    ##   playlist_genre track_name      track_artist         loudness
+    ##   <chr>          <chr>           <chr>                   <dbl>
+    ## 1 latin          Peaceful Forest The Sleep Specialist    -46.4
+
+``` r
+ggplot(loud, aes(loudness, fill=playlist_genre)) +
+  geom_histogram(bins=50) +
+  geom_vline(xintercept = mean(loud$loudness), size = 1, linetype = 6) +
+  my_theme +
+  scale_x_discrete(limits = c(-30, -20, -10, 0, 5)) +
+  ggtitle("Distribution of tracks loudness")
+```
+
+![](Projekt1_Bartek_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+
+``` r
+#SPEECHINESS
+speech <- mydata_train %>% select(playlist_genre, track_name, track_artist, speechiness) %>% group_by(playlist_genre)
+
+speech[speech$speechiness == max(speech$speechiness),]
+```
+
+    ## # A tibble: 1 x 4
+    ## # Groups:   playlist_genre [1]
+    ##   playlist_genre track_name                   track_artist speechiness
+    ##   <chr>          <chr>                        <chr>              <dbl>
+    ## 1 r&b            Warm Water - Snakehips Remix BANKS              0.869
+
+``` r
+ggplot(speech, aes(speechiness, fill=playlist_genre)) +
+  geom_histogram(bins=50) +
+  geom_vline(xintercept = mean(speech$speechiness), size = 1, linetype = 6) +
+  my_theme +
+  ggtitle("Distribution of tracks speechiness") +
+  facet_wrap(~ playlist_genre) 
+```
+
+![](Projekt1_Bartek_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+
+``` r
+#ACOUSTICNESS
+acc <- mydata_train %>% select(playlist_genre, track_name, track_artist, acousticness) %>% group_by(playlist_genre)
+
+acc[acc$acousticness == max(acc$acousticness),]
+```
+
+    ## # A tibble: 1 x 4
+    ## # Groups:   playlist_genre [1]
+    ##   playlist_genre track_name           track_artist             acousticness
+    ##   <chr>          <chr>                <chr>                           <dbl>
+    ## 1 rap            I'm Going to Live M~ DJ Screw & The Screwed ~        0.994
+
+``` r
+ggplot(acc, aes(acousticness, fill=playlist_genre)) +
+  geom_histogram(bins=50) +
+  geom_vline(xintercept = mean(acc$acousticness), size = 1, linetype = 6) +
+  my_theme +
+  ggtitle("Distribution of tracks acousticness") +
+  facet_wrap(~ playlist_genre) 
+```
+
+![](Projekt1_Bartek_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+
+``` r
+#INSTRUMENTALNESS
+ins <- mydata_train %>% select(playlist_genre, track_name, track_artist, instrumentalness) %>% group_by(playlist_genre)
+
+ins[ins$instrumentalness == max(ins$instrumentalness),]
+```
+
+    ## # A tibble: 1 x 4
+    ## # Groups:   playlist_genre [1]
+    ##   playlist_genre track_name                   track_artist instrumentalness
+    ##   <chr>          <chr>                        <chr>                   <dbl>
+    ## 1 latin          Chill Waves & Wind in Leaves Pinetree Way            0.994
+
+``` r
+ggplot(ins, aes(instrumentalness, fill=playlist_genre)) +
+  geom_histogram(bins=50) +
+  geom_vline(xintercept = mean(ins$instrumentalness), size = 1, linetype = 6) +
+  my_theme +
+  ggtitle("Distribution of tracks instrumentalness") +
+  facet_wrap(~ playlist_genre) +
+  scale_x_log10()
+```
+
+    ## Warning: Transformation introduced infinite values in continuous x-axis
+
+    ## Warning: Removed 9590 rows containing non-finite values (stat_bin).
+
+![](Projekt1_Bartek_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+
+``` r
+#LIVENESS
+live <- mydata_train %>% select(playlist_genre, track_name, track_artist, liveness) %>% group_by(playlist_genre)
+
+live[live$liveness == max(live$liveness),]
+```
+
+    ## # A tibble: 1 x 4
+    ## # Groups:   playlist_genre [1]
+    ##   playlist_genre track_name                           track_artist liveness
+    ##   <chr>          <chr>                                <chr>           <dbl>
+    ## 1 rock           Knockin' On Heaven's Door - Live In~ Guns N' Ros~    0.996
+
+``` r
+ggplot(live, aes(liveness, fill=playlist_genre)) +
+  geom_histogram(bins=50) +
+  geom_vline(xintercept = mean(live$liveness), size = 1, linetype = 6) +
+  my_theme +
+  ggtitle("Distribution of tracks liveness") +
+  facet_wrap(~ playlist_genre) 
+```
+
+![](Projekt1_Bartek_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
+
+``` r
+#kradzione od Pawła żeby zobaczyć jak wygląda
+ggplot(live, aes(liveness)) +
+  geom_histogram(bins = 50, aes(y = ..density..), fill = "red") +  
+  geom_density(alpha = 0.002, fill = "black") + 
+  my_theme  + ggtitle("Distribution of liveness") +
+  geom_vline(xintercept = round(mean(live$liveness), 2), size = 1, linetype = 2) +
+  facet_wrap(~ playlist_genre) +scale_x_log10()
+```
+
+    ## Warning: Transformation introduced infinite values in continuous x-axis
+    
+    ## Warning: Transformation introduced infinite values in continuous x-axis
+
+    ## Warning: Removed 1 rows containing non-finite values (stat_bin).
+
+    ## Warning: Removed 1 rows containing non-finite values (stat_density).
+
+![](Projekt1_Bartek_files/figure-gfm/unnamed-chunk-19-2.png)<!-- -->
+
+``` r
+#VALENCE
+vlc <- mydata_train %>% select(playlist_genre, track_name, track_artist, valence) %>% group_by(playlist_genre)
+
+vlc[vlc$valence == max(vlc$valence),]
+```
+
+    ## # A tibble: 1 x 4
+    ## # Groups:   playlist_genre [1]
+    ##   playlist_genre track_name track_artist valence
+    ##   <chr>          <chr>      <chr>          <dbl>
+    ## 1 rock           Low Rider  War            0.991
+
+``` r
+ggplot(vlc, aes(valence, fill=playlist_genre)) +
+  geom_histogram(bins=50) +
+  geom_vline(xintercept = mean(vlc$valence), size = 1, linetype = 6) +
+  my_theme +
+  ggtitle("Distribution of tracks valence") +
+  facet_wrap(~ playlist_genre) 
+```
+
+![](Projekt1_Bartek_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
+
+``` r
+#TEMPO
+temp <- mydata_train %>% select(playlist_genre, track_name, track_artist, tempo) %>% group_by(playlist_genre)
+
+temp[temp$tempo == max(temp$tempo),]
+```
+
+    ## # A tibble: 1 x 4
+    ## # Groups:   playlist_genre [1]
+    ##   playlist_genre track_name     track_artist       tempo
+    ##   <chr>          <chr>          <chr>              <dbl>
+    ## 1 latin          It's Only Time Cabela and Schmitt  220.
+
+``` r
+ggplot(temp, aes(tempo, fill=playlist_genre)) +
+  geom_histogram(bins=50, aes(y = ..density..)) +
+  geom_density(alpha = 0.002, fill = "black") +
+  geom_vline(xintercept = mean(temp$tempo), size = .1, linetype = 6) +
+  my_theme +
+  ggtitle("Distribution of tracks tempo") +
+  facet_wrap(~ playlist_genre) 
+```
+
+![](Projekt1_Bartek_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
+
+``` r
+#DURATION
+dur <- mydata_train %>% select(playlist_genre, track_name, track_artist, duration_ms) %>% group_by(playlist_genre)
+
+dur[dur$duration_ms == max(dur$duration_ms),]
+```
+
+    ## # A tibble: 1 x 4
+    ## # Groups:   playlist_genre [1]
+    ##   playlist_genre track_name track_artist duration_ms
+    ##   <chr>          <chr>      <chr>              <int>
+    ## 1 latin          47 - Remix Anuel AA          517810
+
+``` r
+ggplot(dur, aes(duration_ms, fill=playlist_genre)) +
+  geom_histogram(bins=50) +
+  geom_vline(xintercept = mean(dur$duration_ms), size = .1, linetype = 6) +
+  my_theme +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ggtitle("Distribution of tracks duration") +
+  facet_wrap(~ playlist_genre) 
+```
+
+![](Projekt1_Bartek_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
