@@ -16,19 +16,41 @@ lim_train_t <- mydata_train %>% select(playlist_genre, track_popularity, danceab
 lim_test_t <- mydata_test %>% select(playlist_genre, track_popularity, danceability, energy, key, loudness, mode, acousticness, instrumentalness, liveness, valence, tempo)
 ```
 
-```{r}
-tree <- rpart(playlist_genre ~ ., lim_train_t, method = "class", control = rpart.control(cp=0.00001))
 
-#fancyRpartPlot(tree)
+
+```{r}
+cp <- 0.00001
+accs <- rep(0, length(range))
+test_labels <- lim_test_t$playlist_genre
+k <- seq(1,100,1)
+for (i in k) {
+  
+  tree <- rpart(playlist_genre ~ ., lim_train_t, method = "class", control = rpart.control(cp=cp))
+  pred <- predict(tree, lim_test_t, type = "class")
+  conf <- table(test_labels, pred)  
+  cp <- cp + 0.0001
+  accs[i] <- sum(diag(conf)) / sum(conf)
+  
+}
 ```
 
-```{r}
 
+
+```{r}
+plot(range, accs, xlab = "k")
+which.max(accs)
+accs[which.max(accs)]
 ```
 
+**im niższy wsp cp tym wieksza dokladnosc modelu, ale jego czytelnosc spada diametralnie 
+
+
+
 
 ```{r}
-#summary(tree)
+tree <- rpart(playlist_genre ~ ., lim_train_t, method = "class", control = rpart.control(cp=0.00003))
+
+fancyRpartPlot(tree)
 ```
 
 
@@ -49,27 +71,6 @@ accs <- sum(diag(conf)) / sum(conf)
 accs
 ```
 
-```{r}
-range <- seq(0.00001,0.01,0.0001)
-accs <- rep(0, length(range))
-test_labels <- lim_test_t$playlist_genre
-
-for (cp in range) {
-  tree <- rpart(playlist_genre ~ ., lim_train_t, method = "class", control = rpart.control(cp=cp))
-  pred <- predict(tree, lim_test_t, type = "class")
-  conf <- table(test_labels, pred)  
-  accs[cp] <- sum(diag(conf)) / sum(conf)
-  
-}
-```
-
-
-
-```{r}
-plot(range, accs, xlab = "k")
-which.max(accs)
-
-```
 
 ```{r}
 
