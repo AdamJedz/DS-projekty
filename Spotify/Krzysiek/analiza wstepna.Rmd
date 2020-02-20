@@ -5,26 +5,74 @@ date: "20 02 2020"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r}
+dane <- train_set
+
+library(dplyr)
+library(reshape2)
+library(zoo)
+library(lubridate)
+library(ggplot2)
 ```
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+#Wstepna analiza danych
+```{r}
+head(dane)
+```
+```{r}
+tail(dane)
+```
+```{r}
+summary(dane)
+```
+```{r}
+glimpse(dane)
+```
+```{r}
+dim(dane)
 ```
 
-## Including Plots
+# Weryfikacja wartości brakujących
+```{r}
+na_dane <- sapply(dane, function(y)sum(length(which(is.na(y)))))
+na_dane <- as.data.frame(na_dane); na_dane
+```
+```{r}
+dane[is.na(dane$track_name),]
 
-You can also embed plots, for example:
+```
+# Weryfikacja gatunków muzycznych
+```{r}
+unique(dane$playlist_genre)
+```
+```{r}
+dane%>% 
+  group_by(playlist_genre) %>% 
+  summarise(ilosc_utworow = n())
+```
+```{r}
+dane%>% 
+  group_by(playlist_genre) %>% 
+  summarise(ilosc_utworow = n()) %>% 
+  ggplot() + geom_col(aes(x = playlist_genre, y = ilosc_utworow)) +
+  labs(title = "Rozkład ilość utworów na gatunki muzyczne",
+       x = "Garunki muzyczne",
+       y = "ilość utworów")
+```
+```{r}
+dane$track_album_release_date <- ymd(dane$track_album_release_date)
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+# 1498 rekordów nie posiada odpowiedniego formatu daty
+
+dane$track_album_release_date <- as.yearmon(dane$track_album_release_date, "%Y%m")
+
+dane %>% 
+  group_by(track_album_release_date, playlist_genre) %>% 
+  summarise(ilosc_utworow = n()) %>% 
+  ggplot(aes(x = track_album_release_date, y = ilosc_utworow, color = playlist_genre, fill = playlist_genre)) + geom_col()+
+  labs(title = "Rozkład dodawanych garunków na przestrzeni lat",
+       x = "Rok",
+       y = "ilość utworów")
+
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
