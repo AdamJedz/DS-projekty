@@ -53,7 +53,8 @@ dane%>%
 ```{r}
 dane%>% 
   group_by(playlist_genre) %>% 
-  summarise(ilosc_utworow = n()) %>% 
+  summarise(ilosc_utworow = n()) %>%
+  arrange(desc(ilosc_utworow)) %>% 
   ggplot() + geom_col(aes(x = playlist_genre, y = ilosc_utworow)) +
   labs(title = "Rozkład ilość utworów na gatunki muzyczne",
        x = "Garunki muzyczne",
@@ -64,15 +65,26 @@ dane$track_album_release_date <- ymd(dane$track_album_release_date)
 
 # 1498 rekordów nie posiada odpowiedniego formatu daty
 
-dane$track_album_release_date <- as.yearmon(dane$track_album_release_date, "%Y%m")
+dane$track_album_release_date <- as.Date(as.yearmon(dane$track_album_release_date, "%Y%m"))
 
 dane %>% 
   group_by(track_album_release_date, playlist_genre) %>% 
+  filter(track_album_release_date >= "1963-01-01") %>% 
   summarise(ilosc_utworow = n()) %>% 
   ggplot(aes(x = track_album_release_date, y = ilosc_utworow, color = playlist_genre, fill = playlist_genre)) + geom_col()+
+  scale_x_date(date_breaks = "10 year" )+
   labs(title = "Rozkład dodawanych garunków na przestrzeni lat",
        x = "Rok",
-       y = "ilość utworów")
+       y = "ilość utworów")+
+  ylim(0,300)
 
+
+```
+
+```{r}
+dane %>% 
+  group_by(track_album_release_date) %>% 
+  summarise(ilosc_utworow = n()) %>% 
+  arrange(desc(ilosc_utworow))
 ```
 
