@@ -59,6 +59,8 @@ dane%>%
   labs(title = "Rozkład ilość utworów na gatunki muzyczne",
        x = "Garunki muzyczne",
        y = "ilość utworów")
+
+# Widzimy, że naliczniejszą grupą utworów jest grupa edm, następnie rap i pop
 ```
 ```{r}
 dane$track_album_release_date <- ymd(dane$track_album_release_date)
@@ -73,18 +75,31 @@ dane %>%
   summarise(ilosc_utworow = n()) %>% 
   ggplot(aes(x = track_album_release_date, y = ilosc_utworow, color = playlist_genre, fill = playlist_genre)) + geom_col()+
   scale_x_date(date_breaks = "10 year" )+
-  labs(title = "Rozkład dodawanych garunków na przestrzeni lat",
+  labs(title = "Rozkład dodawanych utworów na przestrzeni lat z podziałem na gatunki",
        x = "Rok",
        y = "ilość utworów")+
   ylim(0,300)
 
-
+# Do roku 1990 najczęściej dodawanym gatunkiem muzycznym był rock i , później zaczęto dodawać rap, latyno i Po
 ```
 
+# Ilość dodawanych utworów w poszczególnych miesiącach
 ```{r}
-dane %>% 
-  group_by(track_album_release_date) %>% 
-  summarise(ilosc_utworow = n()) %>% 
-  arrange(desc(ilosc_utworow))
+dane$miesiac <- month(dane$track_album_release_date)
+
+dane%>% 
+  group_by(miesiac) %>% 
+  summarise(ilosc_utworow = n()) %>%
+  filter(!is.na(miesiac)) %>% 
+  arrange(desc(ilosc_utworow)) %>% 
+  ggplot() + geom_col(aes(x = miesiac, y = ilosc_utworow)) +
+  labs(title = "Rozkład ilość dodawanych utworów w poszczególnych miesiącach",
+       x = "miesiąc",
+       y = "ilość utworów")+
+  scale_x_continuous(breaks = seq(1,12,1))
+
+```
+```{r}
+dcast(dane, track_album_release_date ~ playlist_genre )
 ```
 
