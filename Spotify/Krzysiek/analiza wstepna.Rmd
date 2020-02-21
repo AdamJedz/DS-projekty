@@ -99,6 +99,7 @@ dane%>%
   scale_x_continuous(breaks = seq(1,12,1))
 
 ```
+# Tabela dodawanych utworów na przestrzeni lat z podziałem na gatunek muzyczny
 ```{r}
 dcast(dane, track_album_release_date ~ playlist_genre )
 ```
