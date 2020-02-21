@@ -103,4 +103,56 @@ dane%>%
 ```{r}
 dcast(dane, track_album_release_date ~ playlist_genre )
 ```
+#Analiza składowych podgrup
+
+```{r}
+# Selekcja danych
+dane_podgrupy <- dane %>% 
+  group_by(playlist_genre, playlist_subgenre) %>% 
+  select_if(is.numeric)
+```
+
+```{r}
+head(dane_podgrupy)
+tail(dane_podgrupy)
+unique(dane_podgrupy$playlist_subgenre)
+# widzimy, że dane podgrupy poszczególnych gatunków są wymieszane między sobą. 
+```
+
+```{r}
+dane_podgrupy %>% 
+  group_by(playlist_genre,playlist_subgenre) %>% 
+  summarise(ilosc = n()) %>% 
+  arrange(desc(ilosc))
+
+
+
+# widzimy, że największą podgrupą gatunkową jest progressive elctro house, następnie indie poptisimism i latin hip hop. Naj mniej liczbą podgrupą jest elektropop i ganger rap.
+```
+
+```{r}
+colnames(dane_podgrupy)
+```
+#track_popularity
+```{r}
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
