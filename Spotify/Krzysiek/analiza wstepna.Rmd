@@ -6,7 +6,6 @@ output: html_document
 ---
 
 ```{r}
-dane <- train_set
 
 library(dplyr)
 library(reshape2)
@@ -131,26 +130,145 @@ dane_podgrupy %>%
 ```
 
 ```{r}
-colnames(dane_podgrupy)
+colnames(dane_numeryczne)
+
+dane_numeryczne <- dane %>% 
+  group_by(playlist_genre) %>% 
+  select_if(is.numeric)
+
+colnames(dane_numeryczne)
 ```
 #track_popularity
 ```{r}
 
+ggplot(dane_numeryczne, aes(track_popularity))+
+  geom_histogram(aes(y = ..density..), color = "black", alpha = 0.2, fill = "red")+
+  geom_density(color = "black", size = 1 )+
+  geom_vline(xintercept = mean(dane_numeryczne$track_popularity), size = 1, linetype = 2)+
+  facet_wrap(~playlist_genre)+
+  theme_bw()+
+  labs(title = "Rozkłady zmiennej track_popularity")
+
 ```
 
+#danceability
+```{r}
+ggplot(dane_numeryczne, aes(danceability))+
+  geom_histogram(aes(y = ..density..), color = "black", alpha = 0.2, fill = "red")+
+  geom_density(color = "black", size = 1 )+
+  geom_vline(xintercept = mean(dane_numeryczne$danceability), size = 1, linetype = 2)+
+  facet_wrap(~playlist_genre)+
+  theme_bw()+
+  labs(title = "Rozkłady zmiennej danceability")
+```
+#Energy
+```{r}
+ggplot(dane_numeryczne, aes(energy))+
+  geom_histogram(aes(y = ..density..), color = "black", alpha = 0.2, fill = "red")+
+  geom_density(color = "black", size = 1 )+
+  geom_vline(xintercept = mean(dane_numeryczne$energy), size = 1, linetype = 2)+
+  facet_wrap(~playlist_genre)+
+  theme_bw()+
+  labs(title = "Rozkłady zmiennej energy")
+```
 
+#key
+```{r}
+ggplot(dane_numeryczne, aes(key))+
+  geom_histogram(aes(y = ..density..), color = "black", alpha = 0.2, fill = "red")+
+  geom_density(color = "black", size = 1 )+
+  geom_vline(xintercept = mean(dane_numeryczne$key), size = 1, linetype = 2)+
+  facet_wrap(~playlist_genre)+
+  theme_bw()+
+  labs(title = "Rozkłady zmiennej key")
+```
+#loudness
+```{r}
+ggplot(dane_numeryczne, aes(loudness))+
+  geom_histogram(aes(y = ..density..), color = "black", alpha = 0.2, fill = "red")+
+  geom_density(color = "black", size = 1 )+
+  geom_vline(xintercept = mean(dane_numeryczne$loudness), size = 1, linetype = 2)+
+  facet_wrap(~playlist_genre)+
+  theme_bw()+
+  labs(title = "Rozkłady zmiennej loudness")
+```
+#mode
+```{r}
+ggplot(dane_numeryczne, aes(mode))+
+  geom_histogram(aes(y = ..density..), color = "black", alpha = 0.2, fill = "red")+
+  geom_density(color = "black", size = 1 )+
+  geom_vline(xintercept = mean(dane_numeryczne$mode), size = 1, linetype = 2)+
+  facet_wrap(~playlist_genre)+
+  theme_bw()+
+  labs(title = "Rozkłady zmiennej mode")
+```
 
+#Speechiness
+```{r}
+ggplot(dane_numeryczne, aes(speechiness))+
+  geom_histogram(aes(y = ..density..), color = "black", alpha = 0.2, fill = "red")+
+  geom_density(color = "black", size = 1 )+
+  geom_vline(xintercept = mean(dane_numeryczne$speechiness), size = 1, linetype = 2)+
+  facet_wrap(~playlist_genre)+
+  theme_bw()+
+  labs(title = "Rozkłady zmiennej speechiness")
+```
 
+#instrumentalness
 
+```{r}
+ggplot(dane_numeryczne, aes(instrumentalness))+
+  geom_histogram(aes(y = ..density..), color = "black", alpha = 0.2, fill = "red")+
+  geom_density(color = "black", size = 1 )+
+  geom_vline(xintercept = mean(dane_numeryczne$instrumentalness), size = 1, linetype = 2)+
+  facet_wrap(~playlist_genre)+
+  theme_bw()+
+  labs(title = "Rozkłady zmiennej instrumentalness")
 
+range(dane_numeryczne$instrumentalness)
+```
+#liveness
+```{r}
+ggplot(dane_numeryczne, aes(liveness))+
+  geom_histogram(aes(y = ..density..), color = "black", alpha = 0.2, fill = "red")+
+  geom_density(color = "black", size = 1 )+
+  geom_vline(xintercept = mean(dane_numeryczne$liveness), size = 1, linetype = 2)+
+  facet_wrap(~playlist_genre)+
+  theme_bw()+
+  labs(title = "Rozkłady zmiennej liveness")
+```
 
+#valence
+```{r}
+ggplot(dane_numeryczne, aes(valence))+
+  geom_histogram(aes(y = ..density..), color = "black", alpha = 0.2, fill = "red")+
+  geom_density(color = "black", size = 1 )+
+  geom_vline(xintercept = mean(dane_numeryczne$valence), size = 1, linetype = 2)+
+  facet_wrap(~playlist_genre)+
+  theme_bw()+
+  labs(title = "Rozkłady zmiennej valence")
+```
+#tempo
+```{r}
+ggplot(dane_numeryczne, aes(tempo))+
+  geom_histogram(aes(y = ..density..), color = "black", alpha = 0.2, fill = "red")+
+  geom_density(color = "black", size = 1 )+
+  geom_vline(xintercept = mean(dane_numeryczne$tempo), size = 1, linetype = 2)+
+  facet_wrap(~playlist_genre)+
+  theme_bw()+
+  labs(title = "Rozkłady zmiennej tempo")
+```
 
-
-
-
-
-
-
+#duration
+```{r}
+ggplot(dane_numeryczne, aes(duration_ms))+
+  geom_histogram(aes(y = ..density..), color = "black", alpha = 0.2, fill = "red")+
+  geom_density(color = "black", size = 1 )+
+  geom_vline(xintercept = mean(dane_numeryczne$duration_ms), size = 1, linetype = 2)+
+  facet_wrap(~playlist_genre)+
+  theme_bw()+
+  labs(title = "Rozkłady zmiennej duration_ms")
+```
 
 
 
