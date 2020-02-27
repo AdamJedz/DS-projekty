@@ -1,0 +1,34 @@
+---
+title: "outlier_analiza korelacji"
+author: "Krzysztof Kurek"
+date: "27 02 2020"
+output: html_document
+---
+
+```{r}
+dane <- read.csv("../train_set.csv", stringsAsFactors = FALSE, na.strings="")
+dane$X1 <- NULL
+
+dane_numeryczne <- dane %>% 
+  group_by(playlist_genre) %>% 
+  select_if(is.numeric)
+```
+
+```{r}
+library(GGally)
+```
+
+
+
+```{r}
+ggplot <- function(...) 
+ggplot2::ggplot(...) + scale_color_brewer(palette="Purples") + scale_fill_brewer(palette="Purples")
+unlockBinding("ggplot",parent.env(asNamespace("GGally")))
+assign("ggplot",ggplot,parent.env(asNamespace("GGally")))
+
+graph_corr <- ggpairs(dane_numeryczne, mapping = aes(color = playlist_genre)) 
+graph_corr <- graph_corr + theme_minimal()
+graph_corr
+```
+
+
