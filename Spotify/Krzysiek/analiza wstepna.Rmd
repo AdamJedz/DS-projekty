@@ -16,6 +16,11 @@ library(lubridate)
 library(ggplot2)
 
 dane <- read.csv("../train_set.csv", stringsAsFactors = FALSE, na.strings="")
+dane$X1 <- NULL
+
+dane_numeryczne <- dane %>% 
+  group_by(playlist_genre) %>% 
+  select_if(is.numeric)
 ```
 
 #Wstepna analiza danych
@@ -106,6 +111,105 @@ dane%>%
 ```{r}
 dcast(dane, track_album_release_date ~ playlist_genre )
 ```
+# Analiza poszczególnych grup utworów bez podziału na gatunek
+##trak_popularity
+```{r}
+
+ggplot(dane_numeryczne, aes(track_popularity))+geom_histogram(aes(y=..density..),color="black")+
+  geom_density(color = "black", size =1)+
+  geom_vline(xintercept = mean(dane_numeryczne$track_popularity), size = 1, color = "black", linetype = 2)
+```
+##danceability
+```{r}
+ggplot(dane_numeryczne, aes(danceability))+geom_histogram(aes(y=..density..),color="black")+
+  geom_density(color = "black", size =1)+
+  labs(title = "danceability")+
+  geom_vline(xintercept = mean(dane_numeryczne$danceability), size = 1, color = "black", linetype = 2)+
+  theme_bw()
+```
+##energy
+```{r}
+ggplot(dane_numeryczne, aes(energy))+geom_histogram(aes(y=..density..),color="black")+
+  geom_density(color = "black", size =1)+
+  labs(title = "energy")+
+  geom_vline(xintercept = mean(dane_numeryczne$energy), size = 1, color = "black", linetype = 2)+
+  theme_bw()
+```
+##key
+```{r}
+ggplot(dane_numeryczne, aes(key))+geom_histogram(aes(y=..density..),color="black")+
+  geom_density(color = "black", size =1)+
+  labs(title = "key")+
+  geom_vline(xintercept = mean(dane_numeryczne$key), size = 1, color = "black", linetype = 2)+
+  theme_bw()
+```
+##loudness
+```{r}
+ggplot(dane_numeryczne, aes(loudness))+geom_histogram(aes(y=..density..),color="black")+
+  geom_density(color = "black", size =1)+
+  labs(title = "loudness")+
+  geom_vline(xintercept = mean(dane_numeryczne$loudness), size = 1, color = "black", linetype = 2)+
+  theme_bw()
+```
+## mode
+```{r}
+ggplot(dane_numeryczne, aes(mode))+geom_histogram(aes(y=..density..),color="black")+
+  geom_density(color = "black", size =1)+
+  labs(title = "mode")+
+  geom_vline(xintercept = mean(dane_numeryczne$mode), size = 1, color = "black", linetype = 2)+
+  theme_bw()
+```
+## speechiness
+```{r}
+ggplot(dane_numeryczne, aes(speechiness))+geom_histogram(aes(y=..density..),color="black")+
+  geom_density(color = "black", size =1)+
+  labs(title = "speechiness")+
+  geom_vline(xintercept = mean(dane_numeryczne$speechiness), size = 1, color = "black", linetype = 2)+
+  theme_bw()
+```
+## instrumentalness
+```{r}
+ggplot(dane_numeryczne, aes(instrumentalness))+geom_histogram(aes(y=..density..),color="black")+
+  geom_density(color = "black", size =1)+
+  labs(title = "instrumentalness")+
+  geom_vline(xintercept = mean(dane_numeryczne$instrumentalness), size = 1, color = "black", linetype = 2)+
+  theme_bw()+
+  ylim(0,25)
+```
+## liveness
+```{r}
+ggplot(dane_numeryczne, aes(liveness))+geom_histogram(aes(y=..density..),color="black")+
+  geom_density(color = "black", size =1)+
+  labs(title = "liveness")+
+  geom_vline(xintercept = mean(dane_numeryczne$liveness), size = 1, color = "black", linetype = 2)+
+  theme_bw()
+```
+## valence
+```{r}
+ggplot(dane_numeryczne, aes(valence))+geom_histogram(aes(y=..density..),color="black")+
+  geom_density(color = "black", size =1)+
+  labs(title = "valence")+
+  geom_vline(xintercept = mean(dane_numeryczne$valence), size = 1, color = "black", linetype = 2)+
+  theme_bw()
+```
+## tempo
+```{r}
+ggplot(dane_numeryczne, aes(tempo))+geom_histogram(aes(y=..density..),color="black")+
+  geom_density(color = "black", size =1)+
+  labs(title = "tempo")+
+  geom_vline(xintercept = mean(dane_numeryczne$tempo), size = 1, color = "black", linetype = 2)+
+  theme_bw()
+```
+##duration
+```{r}
+ggplot(dane_numeryczne, aes(duration_ms))+geom_histogram(aes(y=..density..),color="black")+
+  geom_density(color = "black", size =1)+
+  labs(title = "duration_ms")+
+  geom_vline(xintercept = mean(dane_numeryczne$duration_ms), size = 1, color = "black", linetype = 2)+
+  theme_bw()
+```
+
+
 #Analiza składowych podgrup
 
 ```{r}
@@ -133,16 +237,7 @@ dane_podgrupy %>%
 # widzimy, że największą podgrupą gatunkową jest progressive elctro house, następnie indie poptisimism i latin hip hop. Naj mniej liczbą podgrupą jest elektropop i ganger rap.
 ```
 
-```{r}
-
-
-dane_numeryczne <- dane %>% 
-  group_by(playlist_genre) %>% 
-  select_if(is.numeric)
-
-colnames(dane_numeryczne)
-```
-#track_popularity
+## track_popularity
 ```{r}
 
 ggplot(dane_numeryczne, aes(track_popularity))+
@@ -155,7 +250,7 @@ ggplot(dane_numeryczne, aes(track_popularity))+
 
 ```
 
-#danceability
+## danceability
 ```{r}
 ggplot(dane_numeryczne, aes(danceability))+
   geom_histogram(aes(y = ..density..), color = "black", alpha = 0.2, fill = "red")+
@@ -165,7 +260,7 @@ ggplot(dane_numeryczne, aes(danceability))+
   theme_bw()+
   labs(title = "Rozkłady zmiennej danceability")
 ```
-#Energy
+## Energy
 ```{r}
 ggplot(dane_numeryczne, aes(energy))+
   geom_histogram(aes(y = ..density..), color = "black", alpha = 0.2, fill = "red")+
@@ -176,7 +271,7 @@ ggplot(dane_numeryczne, aes(energy))+
   labs(title = "Rozkłady zmiennej energy")
 ```
 
-#key
+## key
 ```{r}
 ggplot(dane_numeryczne, aes(key))+
   geom_histogram(aes(y = ..density..), color = "black", alpha = 0.2, fill = "red")+
@@ -186,7 +281,7 @@ ggplot(dane_numeryczne, aes(key))+
   theme_bw()+
   labs(title = "Rozkłady zmiennej key")
 ```
-#loudness
+## loudness
 ```{r}
 ggplot(dane_numeryczne, aes(loudness))+
   geom_histogram(aes(y = ..density..), color = "black", alpha = 0.2, fill = "red")+
@@ -196,7 +291,7 @@ ggplot(dane_numeryczne, aes(loudness))+
   theme_bw()+
   labs(title = "Rozkłady zmiennej loudness")
 ```
-#mode
+## mode
 ```{r}
 ggplot(dane_numeryczne, aes(mode))+
   geom_histogram(aes(y = ..density..), color = "black", alpha = 0.2, fill = "red")+
@@ -207,7 +302,7 @@ ggplot(dane_numeryczne, aes(mode))+
   labs(title = "Rozkłady zmiennej mode")
 ```
 
-#Speechiness
+## Speechiness
 ```{r}
 ggplot(dane_numeryczne, aes(speechiness))+
   geom_histogram(aes(y = ..density..), color = "black", alpha = 0.2, fill = "red")+
@@ -218,8 +313,8 @@ ggplot(dane_numeryczne, aes(speechiness))+
   labs(title = "Rozkłady zmiennej speechiness")
 ```
 
-#instrumentalness
-
+##instrumentalness
+### Czemu mi sie to chujowo skaluje porównując do Igora?
 ```{r}
 ggplot(dane_numeryczne, aes(instrumentalness))+
   geom_histogram(aes(y = ..density..), color = "black", alpha = 0.2, fill = "red")+
@@ -227,11 +322,12 @@ ggplot(dane_numeryczne, aes(instrumentalness))+
   geom_vline(xintercept = mean(dane_numeryczne$instrumentalness), size = 1, linetype = 2)+
   facet_wrap(~playlist_genre)+
   theme_bw()+
-  labs(title = "Rozkłady zmiennej instrumentalness")
+  labs(title = "Rozkłady zmiennej instrumentalness")+
+  ylim(0,3000)
 
 range(dane_numeryczne$instrumentalness)
 ```
-#liveness
+## liveness
 ```{r}
 ggplot(dane_numeryczne, aes(liveness))+
   geom_histogram(aes(y = ..density..), color = "black", alpha = 0.2, fill = "red")+
@@ -242,7 +338,7 @@ ggplot(dane_numeryczne, aes(liveness))+
   labs(title = "Rozkłady zmiennej liveness")
 ```
 
-#valence
+## valence
 ```{r}
 ggplot(dane_numeryczne, aes(valence))+
   geom_histogram(aes(y = ..density..), color = "black", alpha = 0.2, fill = "red")+
@@ -252,7 +348,7 @@ ggplot(dane_numeryczne, aes(valence))+
   theme_bw()+
   labs(title = "Rozkłady zmiennej valence")
 ```
-#tempo
+## tempo
 ```{r}
 ggplot(dane_numeryczne, aes(tempo))+
   geom_histogram(aes(y = ..density..), color = "black", alpha = 0.2, fill = "red")+
@@ -263,7 +359,7 @@ ggplot(dane_numeryczne, aes(tempo))+
   labs(title = "Rozkłady zmiennej tempo")
 ```
 
-#duration
+## duration
 ```{r}
 ggplot(dane_numeryczne, aes(duration_ms))+
   geom_histogram(aes(y = ..density..), color = "black", alpha = 0.2, fill = "red")+
