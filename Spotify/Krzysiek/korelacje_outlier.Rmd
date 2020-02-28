@@ -1,0 +1,81 @@
+---
+title: "outlier_analiza korelacji"
+author: "Krzysztof Kurek"
+date: "27 02 2020"
+output: html_document
+---
+
+```{r}
+dane <- read.csv("../train_set.csv", stringsAsFactors = FALSE, na.strings="")
+dane$X <- NULL
+
+library(dplyr)
+library(reshape2)
+library(zoo)
+library(lubridate)
+library(ggplot2)
+
+
+dane_numeryczne <- dane %>% 
+  group_by(playlist_genre) %>% 
+  select_if(is.numeric)
+
+dane_numeryczne1 <- dane_numeryczne[,2:14]
+```
+#KORELACJE
+##Tabela korelacji
+```{r}
+korelacje_liczbowo <- round(cor(dane_numeryczne1),2); korelacje_liczbowo
+```
+## Modyfikacja tabeli korelacji - usunięcie wartości powyżej 1 
+```{r}
+upper <- korelacje_liczbowo
+upper[upper.tri(korelacje_liczbowo)] <- ""
+upper <- as.data.frame(upper); upper
+
+```
+## Korelacje - wykres graficzny
+```{r}
+library(corrplot)
+library(RColorBrewer)
+corrplot(korelacje_liczbowo, type = "upper", order ="hclust",
+         col=brewer.pal(n=13, name ="RdYlBu"))
+```
+
+## Korelacje - wykres numeryczny
+```{r}
+corrplot(korelacje_liczbowo,method = "number" ,type = "upper", order ="hclust",
+         col=brewer.pal(n=13, name ="RdYlBu"))
+```
+
+# OUTLIERS
+## wykres boxplot dla każdej zmiennej
+```{r}
+melt_dane_numeryczne <-melt(dane_numeryczne1)
+ggplot(melt_dane_numeryczne, aes(variable, value))+ geom_boxplot()+
+  facet_wrap(~variable, scales = "free")
+```
+
+
+## Wyliczenie IQR
+```{r}
+
+iqr <- melt_dane_numeryczne %>% 
+  group_by(variable) %>% 
+  summarise( IQR= IQR(value));iqr
+```
+## Wyliczenie dolnego przedziału Q -  1.5IQR
+```{r}
+dolny_przedzial <- melt_dane_numeryczne %>% 
+  group_by(variable) %>% 
+  summarise( lower_IQR = quantile(value, 0.25) - 1.5*IQR(value)); dolny_przedzial
+```
+## Wyliczenie górnego przedziału
+```{r}
+gorny_przedzial <- as.data.frame(melt_dane_numeryczne %>% 
+  group_by(variable) %>% 
+  summarise( lower_IQR = quantile(value, 0.75) + 1.5*IQR(value)));gorny_przedzial
+```
+## usunięcie wartości outlier
+
+
