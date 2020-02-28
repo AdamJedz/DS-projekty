@@ -71,8 +71,21 @@ accs <- sum(diag(conf)) / sum(conf)
 accs
 ```
 
-
+head(lim_train)
 ```{r}
+str(lim_train)
+lim_train_glm <- lim_train
+lim_test_glm <- lim_test
+
+lim_train_glm$playlist_genre <- as.factor(lim_train_glm$playlist_genre)
+lim_test_glm$playlist_genre <- as.factor(lim_test_glm$playlist_genre)
+
+logit_model <- glm(data = lim_train_glm, playlist_genre ~ ., family = binomial(link = logit))
+
+summary(logit_model)
+
+pred_glm <- predict(logit_model, lim_test_glm)
+head(pred_glm)
 
 ```
 
