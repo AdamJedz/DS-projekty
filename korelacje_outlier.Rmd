@@ -13,22 +13,35 @@ dane_numeryczne <- dane %>%
   group_by(playlist_genre) %>% 
   select_if(is.numeric)
 ```
-
+#KORELACJE
+##Tabela korelacji
 ```{r}
-library(GGally)
+korelacje_liczbowo <- round(cor(dane_numeryczne1),2); korelacje_liczbowo
+```
+## Modyfikacja tabeli korelacji - usunięcie wartości powyżej 1 
+```{r}
+upper <- korelacje_liczbowo
+upper[upper.tri(korelacje_liczbowo)] <- ""
+upper <- as.data.frame(upper); upper
+
+```
+## Korelacje - wykres graficzny
+```{r}
+library(corrplot)
+library(RColorBrewer)
+corrplot(korelacje_liczbowo, type = "upper", order ="hclust",
+         col=brewer.pal(n=13, name ="RdYlBu"))
 ```
 
-
-
+## Korelacje - wykres numeryczny
 ```{r}
-ggplot <- function(...) 
-ggplot2::ggplot(...) + scale_color_brewer(palette="Purples") + scale_fill_brewer(palette="Purples")
-unlockBinding("ggplot",parent.env(asNamespace("GGally")))
-assign("ggplot",ggplot,parent.env(asNamespace("GGally")))
-
-graph_corr <- ggpairs(dane_numeryczne, mapping = aes(color = playlist_genre)) 
-graph_corr <- graph_corr + theme_minimal()
-graph_corr
+corrplot(korelacje_liczbowo,method = "number" ,type = "upper", order ="hclust",
+         col=brewer.pal(n=13, name ="RdYlBu"))
 ```
 
+# OUTLIERS
+
+```{r}
+IQR(dane_numeryczne)
+```
 
