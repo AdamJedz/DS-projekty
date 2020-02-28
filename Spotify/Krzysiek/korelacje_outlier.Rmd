@@ -2,7 +2,9 @@
 title: "outlier_analiza korelacji"
 author: "Krzysztof Kurek"
 date: "27 02 2020"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r}
@@ -38,8 +40,8 @@ upper <- as.data.frame(upper); upper
 ```{r}
 library(corrplot)
 library(RColorBrewer)
-corrplot(korelacje_liczbowo, type = "upper", order ="hclust",
-         col=brewer.pal(n=13, name ="RdYlBu"))
+corplot1 <- corrplot(korelacje_liczbowo, type = "upper", order ="hclust",
+         col=brewer.pal(n=13, name ="RdYlBu")); corplot1
 ```
 
 ## Korelacje - wykres numeryczny
@@ -70,12 +72,71 @@ dolny_przedzial <- melt_dane_numeryczne %>%
   group_by(variable) %>% 
   summarise( lower_IQR = quantile(value, 0.25) - 1.5*IQR(value)); dolny_przedzial
 ```
+
+
+```{r}
+# Złączenie ponowne w forme wide
+library(tidyr)
+dolny_przedzial <-dolny_przedzial %>% 
+  spread(variable, lower_IQR)
+```
+
+
 ## Wyliczenie górnego przedziału
 ```{r}
 gorny_przedzial <- as.data.frame(melt_dane_numeryczne %>% 
   group_by(variable) %>% 
   summarise( lower_IQR = quantile(value, 0.75) + 1.5*IQR(value)));gorny_przedzial
 ```
-## usunięcie wartości outlier
+
+
+```{r}
+# Złączenie ponowne w forme wide
+gorny_przedzial <- gorny_przedzial %>% 
+  spread(variable, lower_IQR)
+```
+
+
+# Usunięcie wartości outlier
+
+```{r}
+dane_bez_outlier <- dane_numeryczne1 %>% 
+  filter(track_popularity >= dolny_przedzial$track_popularity & track_popularity <= gorny_przedzial$track_popularity,
+         danceability>= dolny_przedzial$danceability & danceability <= gorny_przedzial$danceability,
+        energy>= dolny_przedzial$energy & energy <= gorny_przedzial$energy,
+        key >= dolny_przedzial$key & key <= gorny_przedzial$key,
+        mode >= dolny_przedzial$mode & mode <= gorny_przedzial$mode,
+        speechiness >= dolny_przedzial$speechiness & speechiness <= gorny_przedzial$speechiness,
+        acousticness >= dolny_przedzial$acousticness & acousticness <= gorny_przedzial$acousticness,
+        instrumentalness >= dolny_przedzial$instrumentalness & instrumentalness <= gorny_przedzial$instrumentalness,
+        liveness >= dolny_przedzial$liveness & liveness <= gorny_przedzial$liveness,
+        acousticness >= dolny_przedzial$acousticness & acousticness <= gorny_przedzial$acousticness,
+        valence >= dolny_przedzial$valence & valence <= gorny_przedzial$valence,
+        tempo >= dolny_przedzial$tempo & tempo <= gorny_przedzial$tempo,
+        valence >= dolny_przedzial$valence & valence <= gorny_przedzial$valence,
+        duration_ms >= dolny_przedzial$duration_ms & duration_ms <= gorny_przedzial$duration_ms)
+```
+Usunięcie wartości odstających (outlier) spowodowało usunięcie 10 608 rekordów, co stanowiło 40% całości zbioru.
+
+## Wykres boxplot dla kązdej zmiennej
+```{r}
+melt_bez_outlier <-melt(dane_bez_outlier)
+ggplot(melt_bez_outlier, aes(variable, value))+ geom_boxplot()+
+  facet_wrap(~variable, scales = "free")
+```
+## Wykres graficzny numeryczny korelacji bez outlier
+```{r}
+korelacje_bez_outlier <- round(cor(dane_bez_outlier),2); korelacje_bez_outlier
+
+corrplot(korelacje_bez_outlier,method = "number" ,type = "upper", order ="hclust",
+         col=brewer.pal(n=13, name ="RdYlBu"))
+```
+## Wykres graficzny kolreacji bez outlier
+```{r}
+corplot2 <- corrplot(korelacje_bez_outlier, type = "upper", order ="hclust",
+         col=brewer.pal(n=13, name ="RdYlBu"));corplot2
+```
+
+
 
 
