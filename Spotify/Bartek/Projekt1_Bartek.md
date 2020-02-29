@@ -41,7 +41,7 @@ library(tidyverse)
 
     ## Warning: package 'tidyverse' was built under R version 3.6.2
 
-    ## -- Attaching packages --------------------------------------------------------------------- tidyverse 1.3.0 --
+    ## -- Attaching packages ------------------------------------------------------------- tidyverse 1.3.0 --
 
     ## <U+221A> tibble  2.1.3     <U+221A> purrr   0.3.3
     ## <U+221A> tidyr   1.0.0     <U+221A> stringr 1.4.0
@@ -55,7 +55,7 @@ library(tidyverse)
 
     ## Warning: package 'forcats' was built under R version 3.6.2
 
-    ## -- Conflicts ------------------------------------------------------------------------ tidyverse_conflicts() --
+    ## -- Conflicts ---------------------------------------------------------------- tidyverse_conflicts() --
     ## x lubridate::as.difftime() masks base::as.difftime()
     ## x lubridate::date()        masks base::date()
     ## x dplyr::filter()          masks stats::filter()
@@ -375,7 +375,7 @@ ggplot(subgenre, aes(x=Subgenre, y=n, fill=Genre)) +
 ![](Projekt1_Bartek_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 ``` r
-#chyba nie tak powinnno to wygladac xD
+#using geom point to show genre means as I couldn't find the way to do this with lines
 ```
 
 ``` r
@@ -405,6 +405,22 @@ ggplot(popTracks, aes(track_popularity, fill=playlist_genre)) +
 ![](Projekt1_Bartek_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
 ``` r
+#as we see there are a lot of tracks that are not popular at all
+count(popTracks[popTracks['track_popularity'] <= 0.1,])
+```
+
+    ## # A tibble: 6 x 2
+    ## # Groups:   playlist_genre [6]
+    ##   playlist_genre     n
+    ##   <chr>          <int>
+    ## 1 edm              603
+    ## 2 latin            291
+    ## 3 pop              243
+    ## 4 r&b              398
+    ## 5 rap              342
+    ## 6 rock             312
+
+``` r
 #RELEASE YEAR
 relYear <- mydata_train %>% select(playlist_genre, track_album_release_date) %>% group_by(playlist_genre)
 
@@ -424,6 +440,10 @@ ggplot(relYear, aes(year, fill=playlist_genre)) +
     ## Warning: Ignoring unknown parameters: binwidth, bins, pad
 
 ![](Projekt1_Bartek_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+
+``` r
+#most tracks in the dataset were released after 2010
+```
 
 ``` r
 #DANCEABILITY
@@ -449,6 +469,10 @@ ggplot(dancea, aes(danceability, fill=playlist_genre)) +
 ![](Projekt1_Bartek_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
 ``` r
+#Distribution of danceability is rather normal, skewed to the left. 
+```
+
+``` r
 #ENERGY
 energy <- mydata_train %>% select(playlist_genre, track_name, track_artist, energy) %>% group_by(playlist_genre)
 #most energetic tracks
@@ -471,6 +495,10 @@ ggplot(energy, aes(energy, fill=playlist_genre)) +
 ```
 
 ![](Projekt1_Bartek_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+
+``` r
+#Distribution of energy is skewed to the left. Most tracks are rather energetic.
+```
 
 ``` r
 #KEYS
@@ -558,6 +586,10 @@ ggplot(speech, aes(speechiness, fill=playlist_genre)) +
 ![](Projekt1_Bartek_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
 
 ``` r
+#Distribution of tracks speechiness is skewed to the right. Biggest part of tracks lacks vocal.
+```
+
+``` r
 #ACOUSTICNESS
 acc <- mydata_train %>% select(playlist_genre, track_name, track_artist, acousticness) %>% group_by(playlist_genre)
 
@@ -582,6 +614,10 @@ ggplot(acc, aes(acousticness, fill=playlist_genre)) +
 ![](Projekt1_Bartek_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
 
 ``` r
+#Distribution of tracks acousticness is skewed to the right. Most tracks are not acoustic.
+```
+
+``` r
 #INSTRUMENTALNESS
 ins <- mydata_train %>% select(playlist_genre, track_name, track_artist, instrumentalness) %>% group_by(playlist_genre)
 
@@ -600,13 +636,8 @@ ggplot(ins, aes(instrumentalness, fill=playlist_genre)) +
   geom_vline(xintercept = mean(ins$instrumentalness), size = 1, linetype = 6) +
   my_theme +
   ggtitle("Distribution of tracks instrumentalness") +
-  facet_wrap(~ playlist_genre) +
-  scale_x_log10()
+  facet_wrap(~ playlist_genre) 
 ```
-
-    ## Warning: Transformation introduced infinite values in continuous x-axis
-
-    ## Warning: Removed 9590 rows containing non-finite values (stat_bin).
 
 ![](Projekt1_Bartek_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
 
@@ -635,6 +666,9 @@ ggplot(live, aes(liveness, fill=playlist_genre)) +
 ![](Projekt1_Bartek_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
 
 ``` r
+#Data is skewed to the right - most tracks were not recorded live
+
+
 #kradzione od Pawła żeby zobaczyć jak wygląda
 ggplot(live, aes(liveness)) +
   geom_histogram(bins = 50, aes(y = ..density..), fill = "red") +  
@@ -672,11 +706,25 @@ ggplot(vlc, aes(valence, fill=playlist_genre)) +
   geom_histogram(bins=50) +
   geom_vline(xintercept = mean(vlc$valence), size = 1, linetype = 6) +
   my_theme +
-  ggtitle("Distribution of tracks valence") +
+  ggtitle("Distribution of tracks valence grouped by genre") +
   facet_wrap(~ playlist_genre) 
 ```
 
 ![](Projekt1_Bartek_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
+
+``` r
+ggplot(vlc, aes(valence, fill=playlist_genre)) +
+  geom_histogram(bins=50) +
+  geom_vline(xintercept = mean(vlc$valence), size = 1, linetype = 6) +
+  my_theme +
+  ggtitle("Distribution of tracks valence")
+```
+
+![](Projekt1_Bartek_files/figure-gfm/unnamed-chunk-20-2.png)<!-- -->
+
+``` r
+#Distribution of valence is rather normal. Most tracks sound neutral (or mixed?)
+```
 
 ``` r
 #TEMPO
@@ -693,15 +741,18 @@ temp[temp$tempo == max(temp$tempo),]
 
 ``` r
 ggplot(temp, aes(tempo, fill=playlist_genre)) +
-  geom_histogram(bins=50, aes(y = ..density..)) +
+  geom_histogram(bins=25) +
   geom_density(alpha = 0.002, fill = "black") +
   geom_vline(xintercept = mean(temp$tempo), size = .1, linetype = 6) +
   my_theme +
-  ggtitle("Distribution of tracks tempo") +
-  facet_wrap(~ playlist_genre) 
+  ggtitle("Distribution of tracks tempo") 
 ```
 
 ![](Projekt1_Bartek_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
+
+``` r
+#Bigger part of tracks has more than 120 beats per minute
+```
 
 ``` r
 #DURATION
@@ -727,3 +778,7 @@ ggplot(dur, aes(duration_ms, fill=playlist_genre)) +
 ```
 
 ![](Projekt1_Bartek_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
+
+``` r
+#Distribution of duration is skewed to the right. Most tracks go on for 3 minutes or more.
+```

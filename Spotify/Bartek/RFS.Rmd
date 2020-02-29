@@ -1,16 +1,24 @@
 ---
-title: "Random Forest"
-author: "bartek adamiec"
-date: "28 02 2020"
-output: html_document
+title: "Projekt2_Bartek"
+author: "Bartosz Adamiec"
+date: "17 02 2020"
+output: github_document
+always_allow_html: true
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-install.packages('caret')
+#install.packages('caret')
+library(dplyr)
+library(lubridate)
+library(ggplot2)
+library(tidyverse)
+library(kableExtra)
+library(ggthemes)
+library(corrplot)
 ```
 
-```{r}
+```{r load_and_prep}
 # Random Forest 
 
 #environment preparation and data load
@@ -38,7 +46,7 @@ str(lf_train)
 
 
 
-```{r}
+```{r rf}
 
 # Fitting Random Forest Classification to the Training set
 #install.packages('randomForest')
@@ -59,14 +67,14 @@ y_pred = predict(classifier, newdata = lf_test[-1])
 ```
 
 
-```{r}
+```{r confusion_matrix}
 # Making the Confusion Matrix
 xtab <- table(y_pred, lf_test[, 1])
 library(caret) 
 confusionMatrix(xtab)
 ```
 
-```{r}
+```{r importance_check}
 #checking importance of each collumn
 importance(classifier)
 
@@ -74,9 +82,9 @@ importance(classifier)
 
 
 
-```{r}
+```{r plotting_classifier}
 plot(classifier)
-getTree(classifier, k=1, labelVar=TRUE)
+#getTree(classifier, k=1, labelVar=TRUE)
 # library(ggplot2)
 # pGenres <- predict(classifier,lf_test,'vote')
 # plotData <- lapply(names(lf_test[,-1]), function(x){
@@ -105,7 +113,7 @@ getTree(classifier, k=1, labelVar=TRUE)
 
 
 
-```{r}
+```{r rm_outliers}
 #Random forest without outliers
 
 out_dance <-boxplot(lf_train$danceability, plot=FALSE)$out
@@ -142,7 +150,7 @@ outliers_help <- outliers_help[-which(outliers_help$duration_ms %in% out_duratio
 ```
 
 
-```{r}
+```{r rf_wo_outliers}
 library(randomForest)
 set.seed(123)
 classifier2 = randomForest(x = outliers_help[-1],
@@ -154,7 +162,7 @@ y_pred2 = predict(classifier2, newdata = lf_test[-1])
 ```
 
 
-```{r}
+```{r cm_outliers}
 # Making the Confusion Matrix
 xtab2 <- table(y_pred2, lf_test[,1])
 library(caret) 
