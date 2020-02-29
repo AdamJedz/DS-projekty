@@ -1,0 +1,163 @@
+---
+title: "Random Forest"
+author: "bartek adamiec"
+date: "28 02 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+install.packages('caret')
+```
+
+```{r}
+# Random Forest 
+
+#environment preparation and data load
+my_theme <- theme_fivethirtyeight() + theme(axis.title = element_text(), axis.title.x = element_text())
+
+mydata_train <- read.csv("../train_set.csv", stringsAsFactors = FALSE, na.strings="")
+
+mydata_test <- read.csv("../test_set.csv", stringsAsFactors = FALSE, na.strings="")
+
+lf_train <- mydata_train %>% select(playlist_genre, track_popularity, danceability, energy, key, loudness, mode, speechiness, acousticness, instrumentalness, liveness, valence, tempo, duration_ms)
+
+lf_test <- mydata_test %>% select(playlist_genre, track_popularity, danceability, energy, key, loudness, mode, speechiness, acousticness, instrumentalness, liveness, valence, tempo, duration_ms)
+
+
+
+lf_train <- lf_train %>% mutate_if(is.character,as.factor)
+lf_test <- lf_test %>% mutate_if(is.character,as.factor)
+
+
+lf_train$duration_ms <- scale(lf_train$duration_ms)
+lf_test$duration_ms <- scale(lf_test$duration_ms)
+
+str(lf_train)
+```
+
+
+
+```{r}
+
+# Fitting Random Forest Classification to the Training set
+#install.packages('randomForest')
+#removing as those collumns are not really important
+lf_train$key <- NULL
+lf_test$key <- NULL
+lf_train$mode <- NULL
+lf_test$mode <- NULL
+
+library(randomForest)
+set.seed(123)
+classifier = randomForest(x = lf_train[-1],
+                          y = lf_train$playlist_genre,
+                          ntree = 300)
+
+# Predicting the Test set results
+y_pred = predict(classifier, newdata = lf_test[-1])
+```
+
+
+```{r}
+# Making the Confusion Matrix
+xtab <- table(y_pred, lf_test[, 1])
+library(caret) 
+confusionMatrix(xtab)
+```
+
+```{r}
+#checking importance of each collumn
+importance(classifier)
+
+```
+
+
+
+```{r}
+plot(classifier)
+getTree(classifier, k=1, labelVar=TRUE)
+# library(ggplot2)
+# pGenres <- predict(classifier,lf_test,'vote')
+# plotData <- lapply(names(lf_test[,-1]), function(x){
+#   out <- data.frame(
+#     var = x,
+#     type = c(rep('Actual',nrow(lf_test)),rep('Predicted',nrow(lf_test))),
+#     value = c(lf_test[,x],lf_test[,x]),
+#     genres = c(as.numeric(lf_test$playlist_genre)-1,pGenres)
+#     )
+#   out$value <- out$value-min(out$value) #Normalize to [0,1]
+#   out$value <- out$value/max(out$value)
+#   out
+# })
+# plotData <- do.call(rbind,plotData)
+# qplot(value, genres, data=plotData, facets = type ~ var, geom='smooth', span = 0.5)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+#Random forest without outliers
+
+out_dance <-boxplot(lf_train$danceability, plot=FALSE)$out
+#out_popu <- boxplot(lf_train$track_popularity, plot=FALSE)$out
+out_energy <- boxplot(lf_train$energy, plot=FALSE)$out
+#out_key <- boxplot(lf_train$key, plot=FALSE)$out
+out_loud <- boxplot(lf_train$loudness, plot=FALSE)$out
+out_speech <- boxplot(lf_train$speechiness, plot=FALSE)$out
+out_acoustic <- boxplot(lf_train$acousticness, plot=FALSE)$out
+out_instrumental <- boxplot(lf_train$instrumentalness, plot=FALSE)$out
+out_live <- boxplot(lf_train$liveness, plot=FALSE)$out
+#out_valence <- boxplot(lf_train$valence, plot=FALSE)$out
+out_tempo <- boxplot(lf_train$tempo, plot=FALSE)$out
+out_duration <- boxplot(lf_train$duration_ms, plot=F)$out
+
+#removed inserts where there was no outliers
+
+
+
+outliers_help <- lf_train
+
+outliers_help <- outliers_help[-which(outliers_help$danceability %in% out_dance),]
+outliers_help <- outliers_help[-which(outliers_help$energy %in% out_energy),]
+##outliers_help <- outliers_help[-which(outliers_help$loudness %in% out_loud),]
+outliers_help <- outliers_help[-which(outliers_help$speechiness %in% out_speech),]
+outliers_help <- outliers_help[-which(outliers_help$acousticness %in% out_acoustic),]
+##outliers_help <- outliers_help[-which(outliers_help$instrumentalness %in% out_instrumental),]
+outliers_help <- outliers_help[-which(outliers_help$liveness %in% out_live),]
+outliers_help <- outliers_help[-which(outliers_help$tempo %in% out_tempo),]
+outliers_help <- outliers_help[-which(outliers_help$duration_ms %in% out_duration),]
+
+
+
+```
+
+
+```{r}
+library(randomForest)
+set.seed(123)
+classifier2 = randomForest(x = outliers_help[-1],
+                          y = outliers_help$playlist_genre,
+                          ntree = 500)
+
+# Predicting the Test set results
+y_pred2 = predict(classifier2, newdata = lf_test[-1])
+```
+
+
+```{r}
+# Making the Confusion Matrix
+xtab2 <- table(y_pred2, lf_test[,1])
+library(caret) 
+confusionMatrix(xtab2)
+```
+
