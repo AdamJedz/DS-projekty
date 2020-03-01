@@ -1,0 +1,142 @@
+---
+title: "xgb"
+author: "Bartosz Adamiec"
+date: "17 02 2020"
+output: github_document
+always_allow_html: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+#install.packages('caret')
+#install.packages('mlr')
+library(dplyr)
+library(lubridate)
+library(ggplot2)
+library(tidyverse)
+library(kableExtra)
+library(ggthemes)
+library(corrplot)
+library(data.table)
+library(mlr)
+library(xgboost)
+```
+
+```{r load_and_prep}
+# xgboost
+
+#environment preparation and data load
+my_theme <- theme_fivethirtyeight() + theme(axis.title = element_text(), axis.title.x = element_text())
+
+mydata_train <- read.csv("./train_set.csv", stringsAsFactors = FALSE, na.strings="")
+
+mydata_test <- read.csv("./test_set.csv", stringsAsFactors = FALSE, na.strings="")
+
+xg_train <- mydata_train %>% select(playlist_genre, track_popularity, danceability, energy, key, loudness, mode, speechiness, acousticness, instrumentalness, liveness, valence, tempo, duration_ms)
+
+xg_test <- mydata_test %>% select(playlist_genre, track_popularity, danceability, energy, key, loudness, mode, speechiness, acousticness, instrumentalness, liveness, valence, tempo, duration_ms)
+
+
+
+xg_train <- xg_train %>% mutate_if(is.character,as.factor)
+xg_test <- xg_test %>% mutate_if(is.character,as.factor)
+
+
+xg_train$duration_ms <- scale(xg_train$duration_ms)
+xg_test$duration_ms <- scale(xg_test$duration_ms)
+
+
+
+str(xg_train)
+
+
+```
+
+
+```{r}
+genres = xg_train$playlist_genre
+label = as.integer(xg_train$playlist_genre)-1
+xg_train$playlist_genre = NULL
+xg_test$playlist_genre = NULL
+```
+
+
+```{r}
+n = nrow(xg_train)
+train.index = sample(n,floor(0.75*n))
+train.data = as.matrix(xg_train[train.index,])
+train.label = label[train.index]
+test.data = as.matrix(xg_train[-train.index,])
+test.label = label[-train.index]
+
+xg_test = as.matrix(xg_test)
+
+```
+
+
+```{r}
+xgb.train = xgb.DMatrix(data=train.data,label=train.label)
+xgb.test = xgb.DMatrix(data=test.data,label=test.label)
+xg_test = xgb.DMatrix(data=xg_test,label=test.label)
+```
+
+```{r}
+num_class = length(levels(genres))
+params = list(
+  booster="gbtree",
+  eta=0.001,
+  max_depth=5,
+  gamma=3,
+  subsample=0.75,
+  colsample_bytree=1,
+  objective="multi:softprob",
+  eval_metric="mlogloss",
+  num_class=num_class
+)
+```
+
+```{r}
+# Train the XGBoost classifer
+xgb.fit=xgb.train(
+  params=params,
+  data=xgb.train,
+  nrounds=1000,
+  # nthreads=1,
+  early_stopping_rounds=10,
+  watchlist=list(val1=xgb.train,val2=xgb.test),
+  verbose=0
+)
+
+# Review the final model and results
+xgb.fit
+```
+
+```{r}
+xgb.pred = predict(xgb.fit,test.data,reshape=T)
+xgb.pred = as.data.frame(xgb.pred)
+colnames(xgb.pred) = levels(genres)
+```
+
+```{r}
+xgb.pred$prediction = apply(xgb.pred,1,function(x) colnames(xgb.pred)[which.max(x)])
+xgb.pred$label = levels(genres)[test.label+1]
+```
+
+```{r}
+result = sum(xgb.pred$prediction==xgb.pred$label)/nrow(xgb.pred)
+print(paste("Final Accuracy =",sprintf("%1.2f%%", 100*result)))
+```
+
+```{r}
+xgb.pred = predict(xgb.fit,xg_test,reshape=T)
+xgb.pred = as.data.frame(xgb.pred)
+colnames(xgb.pred) = levels(genres)
+
+xgb.pred$prediction = apply(xgb.pred,1,function(x) colnames(xgb.pred)[which.max(x)])
+xgb.pred$label = levels(genres)[test.label+1]
+
+result = sum(xgb.pred$prediction==xgb.pred$label)/nrow(xgb.pred)
+print(paste("Final Accuracy =",sprintf("%1.2f%%", 100*result)))
+```
+
+

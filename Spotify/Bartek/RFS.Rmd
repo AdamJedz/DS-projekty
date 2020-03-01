@@ -259,3 +259,15 @@ confusionMatrix(xtab4)
 
 #tbh I do not know why accuracies differ but I guess it works
 ```
+
+
+```{r}
+
+rf.mdl <- randomForest(x = lf_train[-1],
+                          y = lf_train$playlist_genre,
+                          ntree = 450,
+                          mtry = 4)
+( rf.cv <- ??rf.crossValidation(rf.mdl, lf_train[-1], 
+                              p=0.10, n=5, ntree=450) )
+```
+
