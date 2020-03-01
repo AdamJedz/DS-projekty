@@ -60,7 +60,8 @@ library(randomForest)
 set.seed(123)
 classifier = randomForest(x = lf_train[-1],
                           y = lf_train$playlist_genre,
-                          ntree = 300)
+                          ntree = 300,
+                          )
 
 # Predicting the Test set results
 y_pred = predict(classifier, newdata = lf_test[-1])
@@ -101,16 +102,6 @@ plot(classifier)
 # plotData <- do.call(rbind,plotData)
 # qplot(value, genres, data=plotData, facets = type ~ var, geom='smooth', span = 0.5)
 ```
-
-
-
-
-
-
-
-
-
-
 
 
 ```{r rm_outliers}
@@ -169,3 +160,102 @@ library(caret)
 confusionMatrix(xtab2)
 ```
 
+-----------
+
+```{r}
+#the cross-validated prediction performance of models with sequentially reduced number of predictors (ranked by variable importance) via a nested cross-validation procedure
+# set.seed(42)
+# xD <- lf_train
+# xD$playlist_genre <- NULL
+# y <- lf_train$playlist_genre
+# 
+# rf.cv <- rfcv(xD, y, cv.fold=10)
+# 
+# with(rf.cv, plot(n.var, error.cv))
+
+#takes 10 minutes to compile and I am not actually sure what does it show tbh
+#?rfcv()
+```
+
+```{r}
+
+library(randomForest)
+#install.packages('mlbench')
+library(mlbench)
+library(caret)
+ 
+# Load Dataset
+dataset <- lf_train
+x <- dataset[,-1]
+y <- dataset[,1]
+# Create model with default paramters
+control <- trainControl(method="repeatedcv", number=10, repeats=3)
+seed <- 7
+metric <- "Accuracy"
+set.seed(seed)
+mtry <- sqrt(ncol(x))
+tunegrid <- expand.grid(.mtry=mtry)
+rf_default <- train(playlist_genre~., data=dataset, method="rf", metric=metric, tuneGrid=tunegrid,
+                    trControl=control)
+print(rf_default)
+```
+
+```{r}
+
+customRF <- list(type = "Classification", library = "randomForest", loop = NULL)
+customRF$parameters <- data.frame(parameter = c("mtry", "ntree"), class = rep("numeric", 2),
+                                  label = c("mtry", "ntree"))
+customRF$grid <- function(x, y, len = NULL, search = "grid") {}
+customRF$fit <- function(x, y, wts, param, lev, last, weights, classProbs, ...) {
+  randomForest(x, y, mtry = param$mtry, ntree=param$ntree, ...)
+}
+customRF$predict <- function(modelFit, newdata, preProc = NULL, submodels = NULL)
+   predict(modelFit, newdata)
+customRF$prob <- function(modelFit, newdata, preProc = NULL, submodels = NULL)
+   predict(modelFit, newdata, type = "prob")
+customRF$sort <- function(x) x[order(x[,1]),]
+customRF$levels <- function(x) x$playlist_genre
+
+```
+
+```{r}
+
+# FINDING NTREE AND MTRY WITH HIGHEST ACCURACY
+
+# !!!!!!!!!!!!!!!!!!!!!!!!!
+# TAKES FOREVER TO COMPILE
+
+
+
+# control <- trainControl(method="repeatedcv", number=10, repeats=2)
+# tunegrid <- expand.grid(.mtry=c(1:5), .ntree=c(150, 300, 450, 600))
+# set.seed(seed)
+# custom <- train(playlist_genre~., data=dataset, method=customRF, metric=metric, tuneGrid=tunegrid,
+#                 trControl=control)
+
+# custom
+# plot(custom)
+# mtry  ntree  Accuracy   Kappa 
+# 4     450    0.5599259  0.4712420
+```
+
+```{r}
+#ntree = 450 mtry = 4
+set.seed(123)
+classifier4 = randomForest(x = lf_train[-1],
+                          y = lf_train$playlist_genre,
+                          ntree = 450,
+                          mtry = 4)
+
+# Predicting the Test set results
+y_pred4 = predict(classifier4, newdata = lf_test[-1])
+```
+
+
+```{r confusion_matrix}
+# Making the Confusion Matrix
+xtab4 <- table(y_pred4, lf_test[, 1])
+confusionMatrix(xtab4)
+
+#tbh I do not know why accuracies differ but I guess it works
+```
