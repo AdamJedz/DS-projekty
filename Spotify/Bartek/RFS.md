@@ -80,7 +80,8 @@ library(randomForest)
 set.seed(123)
 classifier = randomForest(x = lf_train[-1],
                           y = lf_train$playlist_genre,
-                          ntree = 300)
+                          ntree = 300,
+                          )
 
 # Predicting the Test set results
 y_pred = predict(classifier, newdata = lf_test[-1])
@@ -286,3 +287,203 @@ confusionMatrix(xtab2)
     ## Detection Rate           0.1093      0.1212
     ## Detection Prevalence     0.1893      0.1838
     ## Balanced Accuracy        0.7694      0.8531
+
+-----
+
+``` r
+#the cross-validated prediction performance of models with sequentially reduced number of predictors (ranked by variable importance) via a nested cross-validation procedure
+# set.seed(42)
+# xD <- lf_train
+# xD$playlist_genre <- NULL
+# y <- lf_train$playlist_genre
+# 
+# rf.cv <- rfcv(xD, y, cv.fold=10)
+# 
+# with(rf.cv, plot(n.var, error.cv))
+
+#takes 10 minutes to compile and I am not actually sure what does it show tbh
+#?rfcv()
+```
+
+<!-- # ```{r} -->
+
+<!-- # -->
+
+<!-- # library(randomForest) -->
+
+<!-- # #install.packages('mlbench') -->
+
+<!-- # library(mlbench) -->
+
+<!-- # library(caret) -->
+
+<!-- # -->
+
+<!-- # # Load Dataset -->
+
+<!-- # dataset <- lf_train -->
+
+<!-- # x <- dataset[,-1] -->
+
+<!-- # y <- dataset[,1] -->
+
+<!-- # # Create model with default paramters -->
+
+<!-- # control <- trainControl(method="repeatedcv", number=10, repeats=3) -->
+
+<!-- # seed <- 7 -->
+
+<!-- # metric <- "Accuracy" -->
+
+<!-- # set.seed(seed) -->
+
+<!-- # mtry <- sqrt(ncol(x)) -->
+
+<!-- # tunegrid <- expand.grid(.mtry=mtry) -->
+
+<!-- # rf_default <- train(playlist_genre~., data=dataset, method="rf", metric=metric, tuneGrid=tunegrid, -->
+
+<!-- #                     trControl=control) -->
+
+<!-- # print(rf_default) -->
+
+<!-- # ``` -->
+
+<!-- # ```{r xd} -->
+
+<!-- # -->
+
+<!-- # customRF <- list(type = "Classification", library = "randomForest", loop = NULL) -->
+
+<!-- # customRF$parameters <- data.frame(parameter = c("mtry", "ntree"), class = rep("numeric", 2), -->
+
+<!-- #                                   label = c("mtry", "ntree")) -->
+
+<!-- # customRF$grid <- function(x, y, len = NULL, search = "grid") {} -->
+
+<!-- # customRF$fit <- function(x, y, wts, param, lev, last, weights, classProbs, ...) { -->
+
+<!-- #   randomForest(x, y, mtry = param$mtry, ntree=param$ntree, ...) -->
+
+<!-- # } -->
+
+<!-- # customRF$predict <- function(modelFit, newdata, preProc = NULL, submodels = NULL) -->
+
+<!-- #    predict(modelFit, newdata) -->
+
+<!-- # customRF$prob <- function(modelFit, newdata, preProc = NULL, submodels = NULL) -->
+
+<!-- #    predict(modelFit, newdata, type = "prob") -->
+
+<!-- # customRF$sort <- function(x) x[order(x[,1]),] -->
+
+<!-- # customRF$levels <- function(x) x$playlist_genre -->
+
+<!-- # -->
+
+<!-- # ``` -->
+
+<!-- # ```{r xdd} -->
+
+<!-- # -->
+
+<!-- # # FINDING NTREE AND MTRY WITH HIGHEST ACCURACY -->
+
+<!-- # -->
+
+<!-- # # !!!!!!!!!!!!!!!!!!!!!!!!! -->
+
+<!-- # # TAKES FOREVER TO COMPILE -->
+
+<!-- # -->
+
+<!-- # -->
+
+<!-- # -->
+
+<!-- # # control <- trainControl(method="repeatedcv", number=10, repeats=2) -->
+
+<!-- # # tunegrid <- expand.grid(.mtry=c(1:5), .ntree=c(150, 300, 450, 600)) -->
+
+<!-- # # set.seed(seed) -->
+
+<!-- # # custom <- train(playlist_genre~., data=dataset, method=customRF, metric=metric, tuneGrid=tunegrid, -->
+
+<!-- # #                 trControl=control) -->
+
+<!-- # -->
+
+<!-- # # custom -->
+
+<!-- # # plot(custom) -->
+
+<!-- # # mtry  ntree  Accuracy   Kappa -->
+
+<!-- # # 4     450    0.5599259  0.4712420 -->
+
+<!-- # ``` -->
+
+``` r
+#ntree = 450 mtry = 4
+set.seed(123)
+classifier4 = randomForest(x = lf_train[-1],
+                          y = lf_train$playlist_genre,
+                          ntree = 450,
+                          mtry = 4)
+
+# Predicting the Test set results
+y_pred4 = predict(classifier4, newdata = lf_test[-1])
+```
+
+``` r
+# Making the Confusion Matrix
+xtab4 <- table(y_pred4, lf_test[, 1])
+confusionMatrix(xtab4)
+```
+
+    ## Confusion Matrix and Statistics
+    ## 
+    ##        
+    ## y_pred4 edm latin pop r&b rap rock
+    ##   edm   810    82 187  41  64   31
+    ##   latin  86   463 149 104  89   21
+    ##   pop   154   148 378 148  56   81
+    ##   r&b    44   110 152 523 129   73
+    ##   rap    57   152  88 208 764   16
+    ##   rock   44    35 153 101  28  798
+    ## 
+    ## Overall Statistics
+    ##                                           
+    ##                Accuracy : 0.5689          
+    ##                  95% CI : (0.5568, 0.5809)
+    ##     No Information Rate : 0.182           
+    ##     P-Value [Acc > NIR] : < 2.2e-16       
+    ##                                           
+    ##                   Kappa : 0.4823          
+    ##                                           
+    ##  Mcnemar's Test P-Value : 3.255e-11       
+    ## 
+    ## Statistics by Class:
+    ## 
+    ##                      Class: edm Class: latin Class: pop Class: r&b
+    ## Sensitivity              0.6778       0.4677    0.34146    0.46489
+    ## Specificity              0.9246       0.9195    0.89249    0.90665
+    ## Pos Pred Value           0.6667       0.5077    0.39171    0.50727
+    ## Neg Pred Value           0.9281       0.9068    0.86987    0.89126
+    ## Prevalence               0.1820       0.1508    0.16857    0.17131
+    ## Detection Rate           0.1233       0.0705    0.05756    0.07964
+    ## Detection Prevalence     0.1850       0.1389    0.14695    0.15700
+    ## Balanced Accuracy        0.8012       0.6936    0.61698    0.68577
+    ##                      Class: rap Class: rock
+    ## Sensitivity              0.6761      0.7824
+    ## Specificity              0.9042      0.9349
+    ## Pos Pred Value           0.5946      0.6885
+    ## Neg Pred Value           0.9307      0.9589
+    ## Prevalence               0.1721      0.1553
+    ## Detection Rate           0.1163      0.1215
+    ## Detection Prevalence     0.1957      0.1765
+    ## Balanced Accuracy        0.7901      0.8586
+
+``` r
+#tbh I do not know why accuracies differ but I guess it works
+```
