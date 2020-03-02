@@ -1,0 +1,133 @@
+---
+title: "xgb wo splitting"
+author: "Bartosz Adamiec"
+date: "17 02 2020"
+output: github_document
+always_allow_html: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+#install.packages('caret')
+#install.packages('mlr')
+library(dplyr)
+library(lubridate)
+library(ggplot2)
+library(tidyverse)
+library(kableExtra)
+library(ggthemes)
+library(corrplot)
+library(data.table)
+library(mlr)
+library(xgboost)
+```
+
+```{r load_and_prep}
+# xgboost
+
+#environment preparation and data load
+my_theme <- theme_fivethirtyeight() + theme(axis.title = element_text(), axis.title.x = element_text())
+
+mydata_train <- read.csv("./train_set.csv", stringsAsFactors = FALSE, na.strings="")
+
+mydata_test <- read.csv("./test_set.csv", stringsAsFactors = FALSE, na.strings="")
+
+xgg_train <- mydata_train %>% select(playlist_genre, track_popularity, danceability, energy, key, loudness, mode, speechiness, acousticness, instrumentalness, liveness, valence, tempo, duration_ms)
+
+xgg_test <- mydata_test %>% select(playlist_genre, track_popularity, danceability, energy, key, loudness, mode, speechiness, acousticness, instrumentalness, liveness, valence, tempo, duration_ms)
+
+
+
+xgg_train <- xgg_train %>% mutate_if(is.character,as.factor)
+xgg_test <- xgg_test %>% mutate_if(is.character,as.factor)
+
+
+xgg_train$duration_ms <- scale(xgg_train$duration_ms)
+xgg_test$duration_ms <- scale(xgg_test$duration_ms)
+
+
+
+str(xgg_train)
+
+
+```
+
+
+```{r}
+genres = xgg_train$playlist_genre
+label = as.integer(xgg_train$playlist_genre)-1
+label_test = as.integer(xgg_test$playlist_genre)-1
+xgg_train$playlist_genre = NULL
+xgg_test$playlist_genre = NULL
+```
+
+
+```{r}
+train.data = as.matrix(xgg_train)
+train.label = label
+test.data = as.matrix(xgg_test)
+test.label = label_test
+
+nrow(train.data)
+length(train.label)
+length(test.label)
+nrow(test.data)
+
+```
+
+
+```{r}
+xgb.train = xgb.DMatrix(data=train.data,label=train.label)
+xgb.test = xgb.DMatrix(data=test.data,label=test.label)
+```
+
+```{r}
+num_class = length(levels(genres))
+params = list(
+  booster="gbtree",
+  eta=0.001,
+  max_depth=10,
+  gamma=5,
+  subsample=0.75,
+  colsample_bytree=1,
+  objective="multi:softprob",
+  eval_metric="mlogloss",
+  num_class=num_class
+)
+```
+
+```{r}
+# Train the XGBoost classifer
+xgb.fit=xgb.train(
+  params=params,
+  data=xgb.train,
+  nrounds=2000,
+  # nthreads=1,
+  early_stopping_rounds=10,
+  watchlist=list(val1=xgb.train,val2=xgb.test),
+  verbose=0
+)
+
+# Review the final model and results
+xgb.fit
+```
+
+```{r}
+xgb.pred = predict(xgb.fit,test.data,reshape=T)
+xgb.pred = as.data.frame(xgb.pred)
+colnames(xgb.pred) = levels(genres)
+```
+
+```{r}
+xgb.pred$prediction = apply(xgb.pred,1,function(x) colnames(xgb.pred)[which.max(x)])
+xgb.pred$label = levels(genres)[test.label+1]
+```
+
+```{r}
+result = sum(xgb.pred$prediction==xgb.pred$label)/nrow(xgb.pred)
+print(paste("Final Accuracy =",sprintf("%1.2f%%", 100*result)))
+```
+
+
+
+

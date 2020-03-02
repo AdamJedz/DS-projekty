@@ -1,4 +1,4 @@
-xgb
+xgb wo splitting
 ================
 Bartosz Adamiec
 17 02 2020
@@ -13,22 +13,22 @@ mydata_train <- read.csv("./train_set.csv", stringsAsFactors = FALSE, na.strings
 
 mydata_test <- read.csv("./test_set.csv", stringsAsFactors = FALSE, na.strings="")
 
-xg_train <- mydata_train %>% select(playlist_genre, track_popularity, danceability, energy, key, loudness, mode, speechiness, acousticness, instrumentalness, liveness, valence, tempo, duration_ms)
+xgg_train <- mydata_train %>% select(playlist_genre, track_popularity, danceability, energy, key, loudness, mode, speechiness, acousticness, instrumentalness, liveness, valence, tempo, duration_ms)
 
-xg_test <- mydata_test %>% select(playlist_genre, track_popularity, danceability, energy, key, loudness, mode, speechiness, acousticness, instrumentalness, liveness, valence, tempo, duration_ms)
-
-
-
-xg_train <- xg_train %>% mutate_if(is.character,as.factor)
-xg_test <- xg_test %>% mutate_if(is.character,as.factor)
-
-
-xg_train$duration_ms <- scale(xg_train$duration_ms)
-xg_test$duration_ms <- scale(xg_test$duration_ms)
+xgg_test <- mydata_test %>% select(playlist_genre, track_popularity, danceability, energy, key, loudness, mode, speechiness, acousticness, instrumentalness, liveness, valence, tempo, duration_ms)
 
 
 
-str(xg_train)
+xgg_train <- xgg_train %>% mutate_if(is.character,as.factor)
+xgg_test <- xgg_test %>% mutate_if(is.character,as.factor)
+
+
+xgg_train$duration_ms <- scale(xgg_train$duration_ms)
+xgg_test$duration_ms <- scale(xgg_test$duration_ms)
+
+
+
+str(xgg_train)
 ```
 
     ## 'data.frame':    26266 obs. of  14 variables:
@@ -50,27 +50,45 @@ str(xg_train)
     ##   ..- attr(*, "scaled:scale")= num 59897
 
 ``` r
-genres = xg_train$playlist_genre
-label = as.integer(xg_train$playlist_genre)-1
-xg_train$playlist_genre = NULL
-xg_test$playlist_genre = NULL
+genres = xgg_train$playlist_genre
+label = as.integer(xgg_train$playlist_genre)-1
+label_test = as.integer(xgg_test$playlist_genre)-1
+xgg_train$playlist_genre = NULL
+xgg_test$playlist_genre = NULL
 ```
 
 ``` r
-n = nrow(xg_train)
-train.index = sample(n,floor(0.75*n))
-train.data = as.matrix(xg_train[train.index,])
-train.label = label[train.index]
-test.data = as.matrix(xg_train[-train.index,])
-test.label = label[-train.index]
+train.data = as.matrix(xgg_train)
+train.label = label
+test.data = as.matrix(xgg_test)
+test.label = label_test
 
-xg_test = as.matrix(xg_test)
+nrow(train.data)
 ```
+
+    ## [1] 26266
+
+``` r
+length(train.label)
+```
+
+    ## [1] 26266
+
+``` r
+length(test.label)
+```
+
+    ## [1] 6567
+
+``` r
+nrow(test.data)
+```
+
+    ## [1] 6567
 
 ``` r
 xgb.train = xgb.DMatrix(data=train.data,label=train.label)
 xgb.test = xgb.DMatrix(data=test.data,label=test.label)
-xg_test = xgb.DMatrix(data=xg_test,label=test.label)
 ```
 
 ``` r
@@ -78,8 +96,8 @@ num_class = length(levels(genres))
 params = list(
   booster="gbtree",
   eta=0.001,
-  max_depth=5,
-  gamma=3,
+  max_depth=10,
+  gamma=5,
   subsample=0.75,
   colsample_bytree=1,
   objective="multi:softprob",
@@ -93,7 +111,7 @@ params = list(
 xgb.fit=xgb.train(
   params=params,
   data=xgb.train,
-  nrounds=1000,
+  nrounds=2000,
   # nthreads=1,
   early_stopping_rounds=10,
   watchlist=list(val1=xgb.train,val2=xgb.test),
@@ -105,13 +123,13 @@ xgb.fit
 ```
 
     ## ##### xgb.Booster
-    ## raw: 13.6 Mb 
+    ## raw: 336.6 Mb 
     ## call:
-    ##   xgb.train(params = params, data = xgb.train, nrounds = 1000, 
+    ##   xgb.train(params = params, data = xgb.train, nrounds = 2000, 
     ##     watchlist = list(val1 = xgb.train, val2 = xgb.test), verbose = 0, 
     ##     early_stopping_rounds = 10)
     ## params (as set within xgb.train):
-    ##   booster = "gbtree", eta = "0.001", max_depth = "5", gamma = "3", subsample = "0.75", colsample_bytree = "1", objective = "multi:softprob", eval_metric = "mlogloss", num_class = "6", silent = "1"
+    ##   booster = "gbtree", eta = "0.001", max_depth = "10", gamma = "5", subsample = "0.75", colsample_bytree = "1", objective = "multi:softprob", eval_metric = "mlogloss", num_class = "6", silent = "1"
     ## xgb.attributes:
     ##   best_iteration, best_msg, best_ntreelimit, best_score, niter
     ## callbacks:
@@ -119,18 +137,18 @@ xgb.fit
     ##   cb.early.stop(stopping_rounds = early_stopping_rounds, maximize = maximize, 
     ##     verbose = verbose)
     ## # of features: 13 
-    ## niter: 1000
-    ## best_iteration : 1000 
-    ## best_ntreelimit : 1000 
-    ## best_score : 1.450523 
+    ## niter: 2000
+    ## best_iteration : 2000 
+    ## best_ntreelimit : 2000 
+    ## best_score : 1.263173 
     ## nfeatures : 13 
     ## evaluation_log:
     ##     iter val1_mlogloss val2_mlogloss
-    ##        1      1.791117      1.791158
-    ##        2      1.790471      1.790547
+    ##        1      1.790830      1.790987
+    ##        2      1.789900      1.790218
     ## ---                                 
-    ##      999      1.427356      1.450716
-    ##     1000      1.427147      1.450523
+    ##     1999      1.128073      1.263258
+    ##     2000      1.127958      1.263173
 
 ``` r
 xgb.pred = predict(xgb.fit,test.data,reshape=T)
@@ -148,18 +166,4 @@ result = sum(xgb.pred$prediction==xgb.pred$label)/nrow(xgb.pred)
 print(paste("Final Accuracy =",sprintf("%1.2f%%", 100*result)))
 ```
 
-    ## [1] "Final Accuracy = 53.01%"
-
-``` r
-xgb.pred = predict(xgb.fit,xg_test,reshape=T)
-xgb.pred = as.data.frame(xgb.pred)
-colnames(xgb.pred) = levels(genres)
-
-xgb.pred$prediction = apply(xgb.pred,1,function(x) colnames(xgb.pred)[which.max(x)])
-xgb.pred$label = levels(genres)[test.label+1]
-
-result = sum(xgb.pred$prediction==xgb.pred$label)/nrow(xgb.pred)
-print(paste("Final Accuracy =",sprintf("%1.2f%%", 100*result)))
-```
-
-    ## [1] "Final Accuracy = 16.77%"
+    ## [1] "Final Accuracy = 55.98%"
