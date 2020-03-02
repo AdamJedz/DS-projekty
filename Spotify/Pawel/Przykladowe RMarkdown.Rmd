@@ -23,6 +23,26 @@ mydata_train <- read.csv("../train_set.csv", stringsAsFactors = FALSE, na.string
 mydata_test <- read.csv("../test_set.csv", stringsAsFactors = FALSE, na.strings="")
 ```
 
+```{r}
+mydata_train %>% colnames()
+```
+
+```{r}
+summarise(group_by(mydata_train, playlist_genre), srednia = mean(danceability))
+```
+
+
+```{r}
+mydata_train %>% group_by(playlist_genre) %>% summarise(srednia = mean(danceability))
+```
+
+
+
+```{r }
+mydata_train %>% 
+  filter(tempo > 100)
+```
+
 
 union obu zbiorow
 ```{r}

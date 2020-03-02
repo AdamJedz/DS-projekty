@@ -44,7 +44,7 @@ missing_data <- missing_data[missing_data$percent_missing > 0.0, ]
 missing_data  # missing (NA) values in 3 columns
 
 ggplot(missing_data, aes(x = reorder(variables, percent_missing), y = percent_missing))  +
-  geom_bar(stat = "identity", fill = "blue", size = 0.3) + xlab("Column name")
+  geom_bar(stat = "identity", fill = "blue", size = 0.3) + xlab("Column name") + coord_cartesian(ylim = c(.0001, .00017))
 
 mydata %>% filter(is.na(track_name))
 
@@ -63,7 +63,7 @@ ggplot(temp, aes(x = track_album_release_date, y = album_count, color = playlist
   geom_point()
   
 
-quantile(mydata$track_popularity,seq(0,1,by=0.1))
+quantile(mydata$track_popularity,seq(0,1,by=.1))
 
 #variables distribution per playlist_genre
 
@@ -71,7 +71,7 @@ quantile(mydata$track_popularity,seq(0,1,by=0.1))
 #song count per genre
 temp <- mydata %>% select(playlist_genre, track_popularity) %>% group_by(playlist_genre) %>% summarise(count = n())
 
-ggplot(temp, aes(x = playlist_genre)) + geom_bar(fill = "red")
+ggplot(temp, aes(x = count, y = playlist_genre)) + geom_col(fill = "red") + coord_flip()
 
 
 #popularity
@@ -84,6 +84,12 @@ ggplot(temp, aes(track_popularity)) +
   geom_vline(xintercept = round(mean(temp$track_popularity), 2), size = 1, linetype = 2) +
   facet_wrap(~ playlist_genre)
 
+ggplot(temp, aes(x = track_popularity)) +
+  geom_histogram(bins = 50, fill = "red") +  
+  geom_density(alpha = 0.002, fill = "black") + 
+  my_theme  + ggtitle("Distribution of popularity") +
+  geom_vline(xintercept = round(mean(temp$track_popularity), 2), size = 1, linetype = 2) +
+  facet_wrap(~ playlist_genre)
 #danceability
 temp <- mydata %>% select(playlist_genre, danceability) %>% group_by(playlist_genre)
 
@@ -145,7 +151,8 @@ ggplot(temp, aes(acousticness)) +
   geom_density(alpha = 0.002, fill = "black") + 
   my_theme  + ggtitle("Distribution of acousticness") +
   geom_vline(xintercept = round(mean(temp$acousticness), 2), size = 1, linetype = 2) +
-  facet_wrap(~ playlist_genre) +scale_x_log10()
+  facet_wrap(~ playlist_genre) +
+  scale_x_log10()
 
 
 ggplot(temp, aes(x = playlist_genre, y = acousticness)) +
