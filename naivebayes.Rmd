@@ -1,0 +1,89 @@
+---
+title: "naivebayes"
+author: "Bartosz Adamiec"
+date: "03 03 2020"
+output: github_document
+always_allow_html: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+#install.packages('caret')
+library(lubridate)
+library(tidyverse)
+library(kableExtra)
+library(ggthemes)
+library(corrplot)
+library(caret) 
+library(e1071)
+library(klaR)
+```
+
+```{r load_and_prep}
+# Random Forest 
+
+#environment preparation and data load
+my_theme <- theme_fivethirtyeight() + theme(axis.title = element_text(), axis.title.x = element_text())
+
+mydata_train <- read.csv("./train_set.csv", stringsAsFactors = FALSE, na.strings="")
+
+mydata_test <- read.csv("./test_set.csv", stringsAsFactors = FALSE, na.strings="")
+
+nb_train <- mydata_train %>% dplyr::select(playlist_genre, track_popularity, danceability, energy, key, loudness, mode, speechiness, acousticness, instrumentalness, liveness, valence, tempo, duration_ms)
+
+nb_test <- mydata_test %>% dplyr::select(playlist_genre, track_popularity, danceability, energy, key, loudness, mode, speechiness, acousticness, instrumentalness, liveness, valence, tempo, duration_ms)
+
+
+
+nb_train <- nb_train %>% mutate_if(is.character,as.factor)
+nb_test <- nb_test %>% mutate_if(is.character,as.factor)
+
+
+nb_train$duration_ms <- scale(nb_train$duration_ms)
+nb_test$duration_ms <- scale(nb_test$duration_ms)
+
+str(nb_train)
+```
+
+# ```{r}
+# nb_train$key <- train_key
+# nb_test$key <- test_key
+# nb_train$mode <- train_mode
+# nb_test$mode <- test_mode
+# ```
+
+
+```{r}
+train_key <- nb_train$key
+test_key <- nb_test$key
+train_mode <- nb_train$mode
+test_mode <- nb_train$mode
+
+nb_train$key <- NULL
+nb_test$key <- NULL
+nb_train$mode <- NULL
+nb_test$mode <- NULL
+```
+
+
+```{r echo=FALSE}
+model = train(x = nb_train[-1],
+              y = nb_train$playlist_genre,
+              'nb',
+              trControl=trainControl(method='cv',number=10))
+```
+
+```{r echo=FALSE}
+other_pred <- predict(model, newdata = nb_test[-1])
+```
+
+```{r}
+model
+xtabnb_other <- table(other_pred, nb_test[, 1])
+confusionMatrix(xtabnb_other)
+```
+
+```{r}
+getModelInfo(model = 'nb', regex = F)
+```
+
