@@ -20,4 +20,5 @@ Tutaj nie będzie żadnej metryki oceniającej, bo będziemy robili clustering. 
 
 * Raport może być w dowolnej formie - PDF, power point, RMarkdown, Shiny, Jupyter Notebook, PowerBI - co chcecie,
 * Fajnie bedzie przedstawić klastry z porównaniem na kontynenty, regiony, rasy i cokolwiek innego co przyjdzie wam do głowy. Tak, sami musicie dokleić kolumny z tymi informacjami.
-* Liczę na jak najwięcej wykresów.
+* Liczę na jak najwięcej wykresów,
+* Jeżeli nigdy nie robiliście żadnego clustrowania, to najważniejsze algorytmy to k-means i hierarchical clustering (ale też jest kilka innych). Dodatkowo, możecie na danych przeprowadzić PCA i po prostu zaznaczyć na wykresie kółkami wydzielone przez was klastry.
