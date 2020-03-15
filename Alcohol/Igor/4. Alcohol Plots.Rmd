@@ -1,0 +1,153 @@
+---
+title: "4. Alcohol Plots"
+author: "Igor"
+date: "15 03 2020"
+output: github_document
+always_allow_html: True
+---
+
+```{r}
+library(tidyverse)
+library(leaflet)
+```
+
+```{r}
+df <- read_csv('prepared_to_analysis.csv', quoted_na = F)
+```
+
+```{r}
+df %>% glimpse()
+```
+
+```{r}
+df %>% summary()
+```
+
+```{r}
+df[is.na(df$Code),]['Code'] = 'NA'
+df[is.na(df$Continent_Code),]['Continent_Code'] = 'NA'
+```
+
+```{r}
+df$Continent_Code %>% unique()
+```
+
+# Alcohols
+
+## Beers
+
+```{r width =50}
+df %>% 
+  arrange(desc(beer_servings)) %>% 
+  head(10) %>% 
+  ggplot(aes(x = reorder(country, -beer_servings), y = beer_servings)) + 
+  geom_col(aes(fill = Continent_Code), show.legend = T) +
+  labs(title = 'Top 10 beer drinking countries', x= 'Country', y = 'Beers served') +
+  theme(plot.title = element_text(hjust = .5),
+        axis.text.x = element_text(size= 8, angle =25)) +
+  scale_fill_manual(values = c('AF'='bisque4', 'EU'='cornflowerblue', 'AS'='gold2', 'NA'='brown1', 'SA'='coral1', 'OC'='aquamarine3'))
+```
+
+I do not know whether Namibia is 1st on purpose or is it some issue with the data.
+
+```{r}
+df <- df %>% mutate(color = case_when(Continent_Code == 'AF' ~ "black",
+                                Continent_Code == 'EU' ~ "blue",
+                                Continent_Code == 'AS' ~ "yellow",
+                                Continent_Code == 'NA' ~ "red",
+                                Continent_Code == 'SA' ~ "orange",
+                                Continent_Code == 'OC' ~ "green"))
+```
+
+```{r}
+leaflet(data = df) %>% 
+  addTiles() %>% 
+  addCircleMarkers(lat = ~latitude, lng = ~longitude,  color = ~color,radius = ~beer_servings/20)
+```
+
+## Spirits
+
+```{r}
+df %>% 
+  arrange(desc(spirit_servings)) %>% 
+  head(10) %>% 
+  ggplot(aes(x = reorder(country, -spirit_servings), y = spirit_servings)) + 
+  geom_col(aes(fill = Continent_Code), show.legend = T) +
+  labs(title = 'Top 10 spirits drinking countries', x= 'Country', y = 'Spirits served') +
+  theme(plot.title = element_text(hjust = .5),
+        axis.text.x = element_text(size= 8, angle =25)) +
+  scale_fill_manual(values = c('AF'='bisque4', 'EU'='cornflowerblue', 'AS'='gold2', 'NA'='brown1', 'SA'='coral1', 'OC'='aquamarine3'))
+```
+
+```{r}
+leaflet(data = df) %>% 
+  addTiles() %>% 
+  addCircleMarkers(lat = ~latitude, lng = ~longitude,  color = ~color,radius = ~spirit_servings/20)
+```
+
+## Wine
+
+```{r}
+df %>% 
+  arrange(desc(wine_servings)) %>% 
+  head(10) %>% 
+  ggplot(aes(x = reorder(country, -wine_servings), y = wine_servings)) + 
+  geom_col(aes(fill = Continent_Code), show.legend = T) +
+  labs(title = 'Top 10 wine drinking countries', x= 'Country', y = 'Wine served') +
+  theme(plot.title = element_text(hjust = .5),
+        axis.text.x = element_text(size= 8, angle =25)) +
+  scale_fill_manual(values = c('AF'='bisque4', 'EU'='cornflowerblue', 'AS'='gold2', 'NA'='brown1', 'SA'='coral1', 'OC'='aquamarine3'))
+```
+
+Wine is very common drink in Europe.
+
+```{r}
+leaflet(data = df) %>% 
+  addTiles() %>% 
+  addCircleMarkers(lat = ~latitude, lng = ~longitude,  color = ~color,radius = ~wine_servings/20)
+```
+
+## Pure alcohol
+
+```{r}
+df %>% 
+  arrange(desc(total_litres_of_pure_alcohol)) %>% 
+  head(10) %>% 
+  ggplot(aes(x = reorder(country, -total_litres_of_pure_alcohol), y = total_litres_of_pure_alcohol)) + 
+  geom_col(aes(fill = Continent_Code), show.legend = T) +
+  labs(title = 'Top 10 pure alcohol drinking countries', x= 'Country', y = 'Pure alcohol served') +
+  theme(plot.title = element_text(hjust = .5),
+        axis.text.x = element_text(size= 8, angle =25)) +
+  scale_fill_manual(values = c('AF'='bisque4', 'EU'='cornflowerblue', 'AS'='gold2', 'NA'='brown1', 'SA'='coral1', 'OC'='aquamarine3'))
+```
+
+Similar to wine plot (regarding continents).
+
+
+```{r}
+leaflet(data = df) %>% 
+  addTiles() %>% 
+  addCircleMarkers(lat = ~latitude, lng = ~longitude,  color = ~color,radius = ~total_litres_of_pure_alcohol)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
