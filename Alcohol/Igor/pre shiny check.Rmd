@@ -1,0 +1,39 @@
+---
+title: "Untitled"
+author: "Igor"
+date: "16 03 2020"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(rbokeh)
+```
+
+```{r}
+df <- read_csv('to_shiny.csv') %>% select(-X1)
+```
+
+```{r}
+df[is.na(df$Code),]['Code'] = 'NA'
+df[is.na(df$Continent_Code),]['Continent_Code'] = 'NA'
+```
+
+```{r}
+df %>% head()
+```
+
+```{r}
+df %>% 
+  ggplot(aes(x = PC1, y = PC2)) +
+  geom_point(aes(shape = as.factor(Kmeans_5), color = Religion))
+```
+
+```{r}
+point_types(size = 25, color = "blue", width = 800, height = 450)
+
+figure(legend_location = NULL, width= 700, height=500) %>% 
+  ly_points(data = df, x = beer_servings, y = wine_servings, glyph = Continent_Name, color = as.factor(Spectral_7),
+            hover = c(country, 'Continent_Name'))
+```
+
